@@ -1,5 +1,6 @@
 import { Content } from "../models/content.model.js";
 import { contentQueue } from "../queues/content.queue.js";
+import { generateTagsWithAI } from "../services/tagGeneration.service.js";
 
 
 const addContent = async (req, res) => {
@@ -10,10 +11,6 @@ const addContent = async (req, res) => {
         if (!type || !title || !url || !text) {
             return res.status(400).json({ message: "Title, Type, Url and text are required" })
         }
-
-        // tags GENERATE VIA AI
-
-        //embeddingd GONNA BE DONE BY WORKERS
 
         const normalized = {}
         normalized.type = type?.toLowerCase().trim();
