@@ -4,13 +4,15 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon server.js"
+    "dev": "nodemon server.js",
+    "worker": "nodemon src/workers/content.worker.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "module",
   "dependencies": {
+    "@google/genai": "^1.44.0",
     "@google/generative-ai": "^0.24.1",
     "bcryptjs": "^3.0.3",
     "bullmq": "^5.71.0",
@@ -19,6 +21,7 @@
     "dotenv": "^17.3.1",
     "express": "^5.2.1",
     "ioredis": "^5.10.0",
+    "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.3.0"
   },
   "devDependencies": {

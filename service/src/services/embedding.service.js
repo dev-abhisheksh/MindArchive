@@ -1,9 +1,11 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenAI } from "@google/genai";
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 export const generateEmbedding = async (text) => {
-    const model = genAI.getGenerativeModel({ model: "embedding-001" })
-    const res = await model.embedContent(text);
-    return res.data[0].embedding
-}
+    const res = await ai.models.embedContent({
+        model: "gemini-embedding-001",
+        contents: text,
+    });
+    return res.embeddings[0].values;
+};
