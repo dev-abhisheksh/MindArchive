@@ -42,6 +42,20 @@ const addContent = async (req, res) => {
     }
 }
 
+const getMyContent = async (req, res) => {
+    try {
+        const myContent = await Content.find({ userId: req.user._id })
+            .select("-__v -embedding")
+            .sort({ createdAt: -1 });
+
+        return res.status(200).json({ content: myContent })
+    } catch (error) {
+        console.error("Error fetching my content:", error);
+        return res.status(500).json({ message: "Internal server error" });
+    }
+}
+
 export {
-    addContent
+    addContent,
+    getMyContent
 }
