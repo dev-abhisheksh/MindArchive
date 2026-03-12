@@ -7,6 +7,8 @@ import connectDB from "../config/db.js";
 import { Content } from "../models/content.model.js";
 import { generateEmbedding } from "../services/embedding.service.js";
 import { generateTagsWithAI } from "../services/tagGeneration.service.js";
+import { findRelatedContent } from "../services/related.service.js";
+import { RelatedContent } from "../models/relatedContent.model.js";
 
 await connectDB();
 
@@ -17,6 +19,19 @@ const worker = new Worker("content-processing",
         const embedding = await generateEmbedding(text);
         const tags = await generateTagsWithAI(text);
         await Content.findByIdAndUpdate(contentId, { embedding, tags })
+
+        const relatedContent = await findRelatedContent(contentId, embedding);
+
+        await Promise.all(
+            relatedContent.map(related =>
+                RelatedContent.create({
+                    from: contentId,
+                    to: related._id,
+                    relation: "semantic_similarity"
+                })
+            )
+        )
+
     }, { connection: redisClient }
 )
 

@@ -1,7 +1,7 @@
 // models/GraphEdge.js
 import mongoose from "mongoose";
 
-const edgeSchema = new mongoose.Schema({
+const relatedContentSchema = new mongoose.Schema({
     from: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Content"
@@ -15,4 +15,4 @@ const edgeSchema = new mongoose.Schema({
     relation: String
 }, { timestamps: true });
 
-export const GraphEdge = mongoose.model("GraphEdge", edgeSchema);
+export const RelatedContent = mongoose.model("RelatedContent", relatedContentSchema);
