@@ -1,3 +1,6 @@
+import dotenv from "dotenv";
+dotenv.config();
+console.log("REDIS_URL:", process.env.REDIS_URL);
 import { Worker } from "bullmq";
 import redisClient from "../config/redisClient.js";
 import { Content } from "../models/content.model.js";
@@ -10,6 +13,6 @@ const worker = new Worker("content-processing",
         const { contentId, text } = job.data;
         const embedding = await generateEmbedding(text);
 
-        await Content.findByIdAndUpdate(contentId, { embedding })   
+        await Content.findByIdAndUpdate(contentId, { embedding })
     }, { connection: redisClient }
 )
