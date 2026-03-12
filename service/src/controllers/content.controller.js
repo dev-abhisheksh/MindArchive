@@ -21,12 +21,8 @@ const addContent = async (req, res) => {
 
         const existing = await Content.findOne({
             userId,
-            title: normalized.title
+            url: normalized.url
         });
-
-        if (existing) {
-            return res.status(409).json({ message: "Content already saved" });
-        }
 
         const content = await Content.create({
             userId,
