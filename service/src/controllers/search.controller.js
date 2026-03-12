@@ -20,7 +20,16 @@ export const semanticSearch = async (req, res) => {
                 }
             },
             {
-                $project: { embedding: 0 }
+                $project: {
+                    title: 1,
+                    url: 1,
+                    text: 1,
+                    tags: 1,
+                    score: { $meta: "vectorSearchScore" }
+                }
+            },
+            {
+                $match: { score: { $gte: 0.75 } }
             }
         ]);
 
