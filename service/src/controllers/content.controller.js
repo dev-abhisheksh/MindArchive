@@ -12,11 +12,21 @@ const addContent = async (req, res) => {
             return res.status(400).json({ message: "Title, Type, Url and text are required" })
         }
 
+
         const normalized = {}
         normalized.type = type?.toLowerCase().trim();
         normalized.title = title?.trim();
         normalized.url = url?.trim();
         normalized.text = text?.trim();
+
+        const existing = await Content.findOne({
+            userId,
+            title: normalized.title
+        });
+
+        if (existing) {
+            return res.status(409).json({ message: "Content already saved" });
+        }
 
         const content = await Content.create({
             userId,
