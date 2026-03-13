@@ -55,7 +55,44 @@ const getMyContent = async (req, res) => {
     }
 }
 
+const getContentsByTag = async (req, res) => {
+    try {
+        const userId = req.user._id;
+        const groupedByTags = await Content.aggregate([
+            { $match: { userId } },
+            { $unwind: "$tags" },
+            { $group: { _id: "$tags", contents: { $push: "$$ROOT" } } },
+            {
+                $project: {
+                    tag: "$_id",
+                    contents: {
+                        $map: {
+                            input: "$contents",
+                            as: "c",
+                            in: {
+                                _id: "$$c._id",
+                                title: "$$c.title",
+                                url: "$$c.url",
+                                text: "$$c.text",
+                                tags: "$$c.tags",
+                                createdAt: "$$c.createdAt"
+                            }
+                        }
+                    },
+                    _id: 0
+                }
+            }
+        ])
+
+        res.json(groupedByTags)
+    } catch (error) {
+        console.error("Failed to group by tags", error)
+        return res.status(500).json({ message: "Failed to group by tags" })
+    }
+}
+
 export {
     addContent,
-    getMyContent
+    getMyContent,
+    getContentsByTag
 }

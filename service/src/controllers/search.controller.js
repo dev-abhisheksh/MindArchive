@@ -16,7 +16,8 @@ export const semanticSearch = async (req, res) => {
                     path: "embedding",
                     queryVector: queryEmbedding,
                     numCandidates: 100,
-                    limit: 10
+                    limit: 10,
+                    filter: { userId: req.user._id }
                 }
             },
             {
@@ -29,7 +30,7 @@ export const semanticSearch = async (req, res) => {
                 }
             },
             {
-                $match: { score: { $gte: 0.75 } }
+                $match: { score: { $gte: 0.78 } }
             }
         ]);
 

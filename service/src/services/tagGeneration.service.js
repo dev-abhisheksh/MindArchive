@@ -9,7 +9,12 @@ export const generateTagsWithAI = async (text) => {
             messages: [
                 {
                     role: "user",
-                    content: `Generate 5 short tags for this text, return only comma-separated tags, no extra text:\n${text}`
+                    content: `Generate 3–5 broad topic tags (1–2 words each).
+Examples: technology, anime, fitness, fashion, finance, backend, frontend.
+Return only comma-separated tags.
+
+Text:
+${text}`
                 }
             ]
         });

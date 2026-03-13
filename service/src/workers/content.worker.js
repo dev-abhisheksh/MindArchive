@@ -17,7 +17,7 @@ const worker = new Worker("content-processing",
         console.log("Processing Content", job.data)
         const { contentId, text } = job.data;
         const embedding = await generateEmbedding(text);
-        const tags = await generateTagsWithAI(text);
+        const tags = (await generateTagsWithAI(text)).map(t => t.toLowerCase().trim());
         await Content.findByIdAndUpdate(contentId, { embedding, tags })
 
         const relatedContent = await findRelatedContent(contentId, embedding);
