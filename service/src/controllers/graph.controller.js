@@ -8,7 +8,7 @@ const getKnowledegeGraph = async (req, res) => {
         const nodes = await Content.find({ userId })
             .select("title _id tags")
 
-        const edges = await RelatedContent.find({})
+        const edges = await RelatedContent.find({ userId })
             .select("from to")
 
         res.json({ nodes, edges });
