@@ -91,8 +91,37 @@ const getContentsByTag = async (req, res) => {
     }
 }
 
+const contentById = async (req, res) => {
+    try {
+        const { contentId } = req.params;
+
+        if (!contentId) {
+            return res.status(400).json({ message: "ContentId is required" });
+        }
+
+        const content = await Content.findById(contentId)
+            .select("-__v -embedding");
+
+        if (!content) {
+            return res.status(404).json({ message: "Content not found" });
+        }
+
+        return res.status(200).json({
+            success: true,
+            content
+        });
+
+    } catch (error) {
+        console.error("Content fetch error:", error);
+
+        return res.status(500).json({
+            message: "Internal server error"
+        });
+    }
+};
 export {
     addContent,
     getMyContent,
-    getContentsByTag
+    getContentsByTag,
+    contentById
 }

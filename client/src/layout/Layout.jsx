@@ -11,7 +11,7 @@ export default function Layout() {
             <div className="flex flex-1">
                 <Sidebar />
 
-                <div className="flex-1 p-4 overflow-auto">
+                <div className="flex-1 p-4 overflow-auto bg-gray-50">
                     <Outlet />
                 </div>
             </div>

@@ -2,7 +2,7 @@ import { Search, Bell, User, BrainCircuit } from "lucide-react";
 
 export default function Navbar() {
     return (
-        <div className="h-16 w-full bg-white/80 backdrop-blur border-b flex items-center justify-between px-8">
+        <div className="min-h-16 w-full bg-white backdrop-blur border-b flex items-center justify-between px-8">
 
             {/* Left section - Logo */}
             <div className="flex items-center gap-2 font-semibold text-gray-800">
