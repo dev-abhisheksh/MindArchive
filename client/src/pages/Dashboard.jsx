@@ -35,25 +35,28 @@ const Dashboard = () => {
     );
 
     return (
-        /* Removed h-screen and fixed sidebar logic here because Layout.jsx handles it */
-        <div className="max-w-6xl p-3">
-            <header className="flex justify-between items-center">
+        <div className="max-w-6xl mx-auto p-4 md:p-6">
+            {/* Header: Vertical on mobile, horizontal on desktop */}
+            <header className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
                 <div>
-                    <h2 className="text-3xl font-bold capitalize">
+                    <h2 className="text-2xl md:text-3xl font-bold capitalize text-gray-900">
                         {filter === 'all' ? 'Your Library' : `${filter}s`}
                     </h2>
-                    <p className="text-gray-500 mt-1">Found {filteredContent.length} resources</p>
+                    <p className="text-gray-500 mt-1 text-sm md:text-base">
+                        Found {filteredContent.length} resources
+                    </p>
                 </div>
-                
-                {/* Simplified Category Toggles if they aren't in your Sidebar component yet */}
-                <div className="flex gap-2">
+
+                {/* Scrollable category list for mobile touch screens */}
+                <div className="flex gap-2 overflow-x-auto pb-2 md:pb-0 no-scrollbar">
                     {['all', 'article', 'video'].map((cat) => (
-                        <button 
+                        <button
                             key={cat}
                             onClick={() => setFilter(cat)}
-                            className={`px-4 py-1.5 rounded-full text-sm font-medium capitalize transition-all ${
-                                filter === cat ? 'bg-indigo-600 text-white' : 'bg-white border text-gray-600 hover:bg-gray-50'
-                            }`}
+                            className={`px-5 py-2 rounded-full text-sm font-semibold capitalize whitespace-nowrap transition-all border shadow-sm ${filter === cat
+                                    ? 'bg-indigo-600 text-white border-indigo-600'
+                                    : 'bg-white text-gray-600 border-gray-200 hover:border-indigo-300'
+                                }`}
                         >
                             {cat}
                         </button>
@@ -61,22 +64,21 @@ const Dashboard = () => {
                 </div>
             </header>
 
-            {/* Content Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 pt-8">
+            {/* Content Grid: 1 col on mobile, 2 on tablet, 3 on desktop */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                 {filteredContent.length > 0 ? (
                     filteredContent.map((item) => (
                         <div
                             key={item._id}
                             onClick={() => navigate(`/content/${item._id}`)}
-                            className="group bg-white rounded-2xl border border-gray-200 p-5 shadow-sm hover:shadow-md transition-all cursor-pointer hover:-translate-y-1"
+                            className="group bg-white rounded-2xl border border-gray-200 p-5 shadow-sm hover:shadow-md transition-all cursor-pointer active:scale-[0.98] md:hover:-translate-y-1"
                         >
                             <div className="flex items-center justify-between mb-4">
-                                <span className={`text-[10px] uppercase tracking-widest font-bold px-2 py-1 rounded-md ${
-                                    item.type === 'video' ? 'bg-red-100 text-red-600' : 'bg-emerald-100 text-emerald-600'
-                                }`}>
+                                <span className={`text-[10px] uppercase tracking-widest font-bold px-2.5 py-1 rounded-md ${item.type === 'video' ? 'bg-red-50 text-red-600' : 'bg-emerald-50 text-emerald-600'
+                                    }`}>
                                     {item.type}
                                 </span>
-                                <div className="text-gray-400 group-hover:text-indigo-600">
+                                <div className="text-gray-300 group-hover:text-indigo-600 transition-colors">
                                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
                                     </svg>
@@ -87,13 +89,13 @@ const Dashboard = () => {
                                 {item.title}
                             </h3>
 
-                            <p className="text-gray-600 text-sm line-clamp-3 mb-4">
+                            <p className="text-gray-600 text-sm line-clamp-3 mb-4 leading-relaxed">
                                 {item.text}
                             </p>
 
                             <div className="flex flex-wrap gap-2 pt-4 border-t border-gray-50">
                                 {item.tags?.map((tag, idx) => (
-                                    <span key={idx} className="text-xs text-indigo-500 font-medium">
+                                    <span key={idx} className="text-[11px] font-bold text-indigo-500 uppercase">
                                         #{tag}
                                     </span>
                                 ))}
@@ -101,8 +103,8 @@ const Dashboard = () => {
                         </div>
                     ))
                 ) : (
-                    <div className="col-span-full py-20 text-center bg-white rounded-2xl border-2 border-dashed border-gray-200">
-                        <p className="text-gray-400">No {filter} items found yet.</p>
+                    <div className="col-span-full py-16 text-center bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200">
+                        <p className="text-gray-400 font-medium">No {filter} items found.</p>
                     </div>
                 )}
             </div>

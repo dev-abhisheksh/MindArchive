@@ -1,21 +1,37 @@
+import { useState } from "react";
 import { Outlet } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
 import Navbar from "../components/Navbar";
 
 export default function Layout() {
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+    const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
+
     return (
-        <div className="h-screen flex flex-col">
+        <div className="h-screen flex flex-col overflow-hidden">
+            <Navbar onMenuClick={toggleSidebar} />
 
-            <Navbar />
+            <div className="flex flex-1 overflow-hidden relative">
+                <div className={`
+                    fixed inset-y-0 left-0 z-40 w-64 bg-white transform transition-transform duration-300 ease-in-out
+                    md:relative md:translate-x-0 
+                    ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}
+                `}>
+                    <Sidebar />
+                </div>
 
-            <div className="flex flex-1">
-                <Sidebar />
+                {isSidebarOpen && (
+                    <div
+                        className="fixed inset-0 bg-black/20 z-30 md:hidden"
+                        onClick={toggleSidebar}
+                    />
+                )}
 
                 <div className="flex-1 p-4 overflow-auto bg-gray-50">
                     <Outlet />
                 </div>
             </div>
-
         </div>
     );
 }
