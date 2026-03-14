@@ -7,15 +7,16 @@ import GraphView from './pages/GraphView'
 import Collections from './pages/Collections'
 import Layout from './layout/Layout'
 import ContentDetail from './pages/ContentDetail'
+import ProtectedRoute from './route/ProtectedRoute'
 
 const App = () => {
   return (
     <div>
       <Routes>
         <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register/>} />
+        <Route path="/register" element={<Register />} />
 
-        <Route element={<Layout/>}>
+        <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
           <Route path="/" element={<Dashboard />} />
           <Route path="/graph" element={<GraphView />} />
           <Route path="/collections" element={<Collections />} />
