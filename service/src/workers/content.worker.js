@@ -15,12 +15,12 @@ await connectDB();
 const worker = new Worker("content-processing",
     async (job) => {
         console.log("Processing Content", job.data)
-        const { contentId, text } = job.data;
+        const { contentId, text, userId } = job.data;
         const embedding = await generateEmbedding(text);
         const tags = (await generateTagsWithAI(text)).map(t => t.toLowerCase().trim());
         await Content.findByIdAndUpdate(contentId, { embedding, tags })
 
-        const relatedContent = await findRelatedContent(contentId, embedding);
+        const relatedContent = await findRelatedContent(contentId, embedding, userId);
 
         await Promise.all(
             relatedContent.map(related =>

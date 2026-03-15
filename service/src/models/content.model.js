@@ -22,6 +22,12 @@ const contentSchema = new mongoose.Schema({
 
     embedding: [Number],
 
+    collectionId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Collection",
+        default: null
+    },
+
     createdAt: {
         type: Date,
         default: Date.now

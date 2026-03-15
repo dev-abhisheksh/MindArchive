@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import { Content } from "../models/content.model.js"
 
-export const findRelatedContent = async (contentId, embedding) => {
+export const findRelatedContent = async (contentId, embedding, userId) => {
     try {
         const results = await Content.aggregate([
             {
@@ -14,8 +14,18 @@ export const findRelatedContent = async (contentId, embedding) => {
                 }
             },
             {
-                $match: { _id: { $ne: new mongoose.Types.ObjectId(contentId) } }
-            }
+                $addFields: {
+                    score: { $meta: "vectorSearchScore" }
+                }
+            },
+            {
+                $match: {
+                    _id: { $ne: new mongoose.Types.ObjectId(contentId) },
+                    userId: new mongoose.Types.ObjectId(userId),
+                    score: { $gte: 0.78 }
+                }
+            },
+            { $limit: 5 }
         ])
 
         return results;

@@ -2,13 +2,18 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { contentById } from "../api/content.api";
 import Button from "../components/Button";
+import { fetchRelatedContents } from "../api/relatedContent.api";
 
 const ContentDetail = () => {
     const [content, setContent] = useState(null);
+    const [relatedContent, setRelatedContent] = useState([])
     const { id } = useParams();
     const navigate = useNavigate();
 
     useEffect(() => {
+        setContent(null);
+        setRelatedContent([]);
+
         const fetchContentDetail = async () => {
             try {
                 const res = await contentById(id);
@@ -17,8 +22,21 @@ const ContentDetail = () => {
                 console.error(error);
             }
         };
+
+        const allRelatedContents = async () => {
+            try {
+                const res = await fetchRelatedContents(id)
+                setRelatedContent(res.data)
+                console.log(res.data)
+            } catch (error) {
+                console.error(error)
+            }
+        }
+
         fetchContentDetail();
+        allRelatedContents()
     }, [id]);
+
 
     const getYouTubeEmbedUrl = (url) => {
         const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
@@ -56,6 +74,7 @@ const ContentDetail = () => {
                     <Button
                         text="Open Source"
                         className="bg-black text-white"
+                        onClick={() => navigate(content.url)}
                     />
                 </div>
             </header>
@@ -116,6 +135,45 @@ const ContentDetail = () => {
                     </div>
                 </div>
             </main>
+
+            <div className="flex gap-3">
+                {relatedContent.map((item) => (
+                    <div
+                        key={item._id}
+                        onClick={() => navigate(`/content/${item.to._id}`)}
+                        className="group bg-white rounded-2xl border border-gray-200 p-5 shadow-sm hover:shadow-md transition-all cursor-pointer active:scale-[0.98] md:hover:-translate-y-1"
+                    >
+                        <div className="flex items-center justify-between mb-4">
+                            <span className={`text-[10px] uppercase tracking-widest font-bold px-2.5 py-1 rounded-md ${item.type === 'video' ? 'bg-red-50 text-red-600' : 'bg-emerald-50 text-emerald-600'
+                                }`}>
+                                {item.to.type}
+                            </span>
+                            <div className="text-gray-300 group-hover:text-indigo-600 transition-colors">
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+                                </svg>
+                            </div>
+                        </div>
+
+                        <h3 className="text-lg font-bold leading-tight mb-2 group-hover:text-indigo-600 transition-colors line-clamp-2">
+                            {item.to.title}
+                        </h3>
+
+                        <p className="text-gray-600 text-sm line-clamp-3 mb-4 leading-relaxed">
+                            {item.to.text}
+                        </p>
+
+                        <div className="flex flex-wrap gap-2 pt-4 border-t border-gray-50">
+                            {item.to.tags?.map((tag, idx) => (
+                                <span key={idx} className="text-[11px] font-bold text-indigo-500 uppercase">
+                                    #{tag}
+                                </span>
+                            ))}
+                        </div>
+                    </div>
+                ))}
+            </div>
+
         </div>
     );
 };

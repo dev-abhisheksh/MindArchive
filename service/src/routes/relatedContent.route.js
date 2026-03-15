@@ -4,6 +4,6 @@ import { getRelatedContent } from "../controllers/relatedContent.controller.js";
 
 const router = express.Router();
 
-router.get("/related-content/:contentId", verifyToken, getRelatedContent)
+router.get("/:contentId", verifyToken, getRelatedContent)
 
 export default router;
