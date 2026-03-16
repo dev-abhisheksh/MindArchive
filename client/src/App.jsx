@@ -8,6 +8,7 @@ import Collections from './pages/Collections'
 import Layout from './layout/Layout'
 import ContentDetail from './pages/ContentDetail'
 import ProtectedRoute from './route/ProtectedRoute'
+import DetailedCollection from './pages/DetailedCollection'
 
 const App = () => {
   return (
@@ -20,6 +21,7 @@ const App = () => {
           <Route path="/" element={<Dashboard />} />
           <Route path="/graph" element={<GraphView />} />
           <Route path="/collections" element={<Collections />} />
+          <Route path="/collection/:id" element={<DetailedCollection />} />
           <Route path="/content/:id" element={<ContentDetail />} />
         </Route>
       </Routes>
