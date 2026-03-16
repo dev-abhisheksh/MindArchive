@@ -10,7 +10,13 @@ const collectionSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+
     description: String,
+
+    isDeleted: {
+        type: Boolean,
+        default: false
+    }
 
 }, { timestamps: true })
 

@@ -32,6 +32,16 @@ const worker = new Worker("content-processing",
             )
         )
 
+        await Promise.all(
+            relatedContent.map(related =>
+                RelatedContent.create({
+                    from: related._id, 
+                    to: contentId,
+                    relation: "semantic_similarity"
+                })
+            )
+        );
+
     }, { connection: redisClient }
 )
 

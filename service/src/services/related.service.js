@@ -25,7 +25,7 @@ export const findRelatedContent = async (contentId, embedding, userId) => {
                     score: { $gte: 0.78 }
                 }
             },
-            { $limit: 5 }
+            { $limit: 10 }
         ])
 
         return results;
