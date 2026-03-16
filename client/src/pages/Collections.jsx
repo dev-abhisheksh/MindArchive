@@ -1,10 +1,18 @@
 import React, { useEffect, useState } from 'react';
-import { fetchCollections } from '../api/collection.api';
-import { FolderOpen, MoreVertical, Layers } from 'lucide-react';
+import { createCollection, fetchCollections, updateCollection } from '../api/collection.api';
+import { FolderOpen, MoreVertical, Layers, X, Pencil, Trash2 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const Collections = () => {
   const [collections, setCollections] = useState([]);
+  const [createCollectionModalOpen, setCreateCollectionModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false)
+  const [name, setName] = useState('');
+  const [description, setDescription] = useState('');
+  const [openOptioNModal, setOpenOptionModal] = useState(null)
+  const [selectedCollection, setSelectedCollection] = useState(null)
+  const navigate = useNavigate()
 
   useEffect(() => {
     const fetchAllCollections = async () => {
@@ -20,6 +28,37 @@ const Collections = () => {
     fetchAllCollections();
   }, []);
 
+  const addCollection = async () => {
+    if (!name.trim()) return;
+    try {
+      const res = await createCollection({ name, description });
+      setCollections(prev => [...prev, res.data.collection || res.data]);
+      setName('');
+      setDescription('');
+      setCreateCollectionModalOpen(false);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const updateCollectionDetails = async () => {
+    try {
+      const res = await updateCollection(selectedCollection._id, { name, description })
+      setCollections(prev => prev.map(col => col._id === selectedCollection._id ? res.data.collection || res.data : col))
+      setIsUpdateModalOpen(false)
+      setSelectedCollection(null)
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+  useEffect(() => {
+    if (selectedCollection) {
+      setName(selectedCollection.name)
+      setDescription(selectedCollection.description)
+    }
+  }, [selectedCollection])
+
   if (loading) return (
     <div className="flex h-full items-center justify-center">
       <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-600"></div>
@@ -33,22 +72,26 @@ const Collections = () => {
         <p className="text-gray-500 mt-1">Organized groups of your saved knowledge.</p>
       </header>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 relative">
         {collections.map((collection) => (
-          <div key={collection._id} className="group cursor-pointer">
-            {/* Folder / Stack Preview Effect */}
+          <div key={collection._id}
+            onClick={() => navigate(`/collections/${collection._id}`)}
+            className="group cursor-pointer">
             <div className="relative mb-4">
-              {/* Decorative background cards to create a "stack" look */}
               <div className="absolute inset-0 bg-indigo-100 rounded-2xl transform translate-x-2 translate-y-2 group-hover:translate-x-3 group-hover:translate-y-3 transition-transform duration-300"></div>
               <div className="absolute inset-0 bg-white border border-gray-200 rounded-2xl transform translate-x-1 translate-y-1 group-hover:translate-x-1.5 group-hover:translate-y-1.5 transition-transform duration-300 shadow-sm"></div>
-              
-              {/* Main Preview Card */}
+
               <div className="relative bg-white border border-gray-200 rounded-2xl p-5 shadow-sm min-h-[160px] flex flex-col justify-between overflow-hidden">
                 <div className="flex justify-between items-start">
                   <div className="p-2 bg-indigo-50 text-indigo-600 rounded-lg">
                     <Layers size={20} />
                   </div>
-                  <button className="text-gray-400 hover:text-gray-600">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      setOpenOptionModal(openOptioNModal === collection._id ? null : collection._id)
+                    }}
+                    className="text-gray-400 hover:text-gray-600">
                     <MoreVertical size={18} />
                   </button>
                 </div>
@@ -62,34 +105,175 @@ const Collections = () => {
                   </p>
                 </div>
 
-                {/* Tiny preview list of contents */}
+                {/* FIX 3: Optional chain so it doesn't crash when previewContents is undefined */}
                 <div className="mt-4 space-y-1">
-                  {collection.previewContents.slice(0, 2).map((content) => (
-                    <div key={content._id} className="text-[11px] text-gray-400 flex items-center gap-2 truncate">
+                  {collection.previewContents?.slice(0, 2).map((content, idx) => (
+                    <div key={content._id || idx} className="text-[11px] text-gray-400 flex items-center gap-2 truncate">
                       <div className="w-1 h-1 rounded-full bg-gray-300"></div>
                       {content.title}
                     </div>
                   ))}
-                  {collection.previewContents.length > 2 && (
+                  {collection.previewContents?.length > 2 && (
                     <span className="text-[10px] text-indigo-400 font-bold uppercase tracking-wider">
                       +{collection.previewContents.length - 2} more items
                     </span>
                   )}
+
+                  {openOptioNModal === collection._id && (
+                    <div className="absolute top-10 right-3 w-44 bg-white border border-gray-100 rounded-xl shadow-xl z-50 overflow-hidden py-2">
+                      <div className="px-4 py-2 text-[10px] font-bold text-gray-400 uppercase border-b border-gray-50">
+                        Options
+                      </div>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          setSelectedCollection(collection)
+                          setIsUpdateModalOpen(true)
+                          setOpenOptionModal(null)
+                          setName(collection.name)
+                          setDescription(collection.description)
+                        }}
+                        className="w-full text-left px-4 py-2 text-sm text-gray-600 hover:bg-indigo-50 hover:text-indigo-600 transition-colors flex items-center gap-2"
+                      >
+                        <Pencil size={13} /> Edit
+                      </button>
+                      <button
+                        onClick={(e) => { e.stopPropagation() }}
+                        className="w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-red-50 transition-colors flex items-center gap-2"
+                      >
+                        <Trash2 size={13} /> Delete
+                      </button>
+                    </div>
+                  )}
                 </div>
+
+                {isUpdateModalOpen && (
+                  <div className='fixed inset-0 z-50 flex items-center justify-center bg-gray-900/20 backdrop-blur-sm animate-in fade-in duration-200'>
+                    <div className='bg-white p-6 rounded-2xl shadow-2xl w-[90%] max-w-sm border border-gray-100 flex flex-col'>
+
+                      <div className="flex justify-between items-center mb-6">
+                        <h2 className="text-xl font-bold text-gray-900">Edit Collection</h2>
+                        <button
+                          onClick={() => setIsUpdateModalOpen(false)}
+                          className="p-1 hover:bg-gray-100 rounded-lg transition-colors"
+                        >
+                          <X size={20} className="text-gray-400" />
+                        </button>
+                      </div>
+
+                      <div className="space-y-4">
+                        <div>
+                          <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Name</label>
+                          <input
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                            className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Description</label>
+                          <textarea
+                            value={description}
+                            onChange={(e) => setDescription(e.target.value)}
+                            className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 transition-all resize-none"
+                            rows={3}
+                          />
+                        </div>
+                      </div>
+
+                      <div className="flex gap-3 mt-8">
+                        <button
+                          onClick={() => setIsUpdateModalOpen(false)}
+                          className="flex-1 py-3 text-sm font-semibold text-gray-600 hover:bg-gray-50 rounded-xl transition-colors"
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          onClick={updateCollectionDetails}
+                          className="flex-1 py-3 bg-indigo-600 text-white rounded-xl font-semibold shadow-lg shadow-indigo-100 active:scale-95 transition-all"
+                        >
+                          Save
+                        </button>
+                      </div>
+
+                    </div>
+                  </div>
+                )}
+
               </div>
             </div>
           </div>
         ))}
 
-        {/* Create New Collection Placeholder */}
-        <button className="border-2 border-dashed border-gray-200 rounded-2xl p-6 flex flex-col items-center justify-center text-gray-400 hover:border-indigo-300 hover:text-indigo-500 transition-all min-h-[220px]">
-          <div className="p-3 bg-gray-50 rounded-full mb-3 group-hover:bg-indigo-50">
+        <button
+          onClick={() => setCreateCollectionModalOpen(true)}
+          className="border-2 border-dashed border-gray-200 rounded-2xl p-6 flex flex-col items-center justify-center text-gray-400 hover:border-indigo-300 hover:text-indigo-500 transition-all min-h-[220px]">
+          <div className="p-3 bg-gray-50 rounded-full mb-3">
             <FolderOpen size={24} />
           </div>
           <span className="font-medium">New Collection</span>
         </button>
+
+
       </div>
-    </div>
+
+      {/* FIX 2: Moved outside the grid, changed absolute → fixed so it covers the full viewport */}
+      {
+        createCollectionModalOpen && (
+          <div className='fixed inset-0 z-50 flex items-center justify-center bg-gray-900/20 backdrop-blur-sm animate-in fade-in duration-200'>
+            <div className='bg-white p-6 rounded-2xl shadow-2xl w-[90%] max-w-sm border border-gray-100 flex flex-col'>
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-xl font-bold text-gray-900">New Collection</h2>
+                <button
+                  onClick={() => setCreateCollectionModalOpen(false)}
+                  className="p-1 hover:bg-gray-100 rounded-lg transition-colors"
+                >
+                  <X size={20} className="text-gray-400" />
+                </button>
+              </div>
+
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Name</label>
+                  {/* FIX 1: Controlled inputs wired to state */}
+                  <input
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
+                    placeholder="e.g. Design Inspiration"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Description</label>
+                  <textarea
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 transition-all resize-none"
+                    placeholder="What's this for?"
+                    rows={3}
+                  />
+                </div>
+              </div>
+
+              <div className="flex gap-3 mt-8">
+                <button
+                  onClick={() => setCreateCollectionModalOpen(false)}
+                  className="flex-1 py-3 text-sm font-semibold text-gray-600 hover:bg-gray-50 rounded-xl transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={addCollection}
+                  className="flex-1 py-3 bg-indigo-600 text-white rounded-xl font-semibold shadow-lg shadow-indigo-100 active:scale-95 transition-all">
+                  Create
+                </button>
+              </div>
+            </div>
+          </div>
+        )
+      }
+    </div >
   );
 };
 

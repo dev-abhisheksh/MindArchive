@@ -21,7 +21,7 @@ const App = () => {
           <Route path="/" element={<Dashboard />} />
           <Route path="/graph" element={<GraphView />} />
           <Route path="/collections" element={<Collections />} />
-          <Route path="/collection/:id" element={<DetailedCollection />} />
+          <Route path="/collections/:id" element={<DetailedCollection />} />
           <Route path="/content/:id" element={<ContentDetail />} />
         </Route>
       </Routes>
