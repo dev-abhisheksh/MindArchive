@@ -34,7 +34,7 @@ export const semanticSearch = async (req, res) => {
             }
         ]);
 
-        res.json(results);
+        res.json({ results });
     } catch (error) {
         console.error("Search error", error);
         res.status(500).json({ message: "Search failed", error });
