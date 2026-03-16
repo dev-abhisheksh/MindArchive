@@ -6,6 +6,7 @@ import contentRouter from "./routes/content.route.js";
 import searchRouter from "./routes/search.route.js";
 import relatedContentRouter from "./routes/relatedContent.route.js";
 import graphRouter from "./routes/graph.route.js";
+import collectionRouter from "./routes/collection.route.js";
 
 dotenv.config();
 const app = express();
@@ -24,5 +25,6 @@ app.use("/api/content", contentRouter);
 app.use("/api/search", searchRouter);
 app.use("/api/related-content", relatedContentRouter);
 app.use("/api/graphs", graphRouter)
+app.use("/api/collection", collectionRouter)
 
 export default app;
