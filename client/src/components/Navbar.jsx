@@ -15,7 +15,6 @@ export default function Navbar() {
     const [isLoading, setIsLoading] = useState(false);
     const searchRef = useRef(null);
 
-    // 1. Close search when clicking outside
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (searchRef.current && !searchRef.current.contains(event.target)) {
@@ -26,16 +25,14 @@ export default function Navbar() {
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
 
-    // 2. Body Scroll Lock
     useEffect(() => {
-        if ((searchData && query) || isMobileSearchOpen) {
+        if ((searchData && query) || isMobileSearchOpen || isMenuOpen) {
             document.body.style.overflow = 'hidden';
         } else {
             document.body.style.overflow = 'unset';
         }
-    }, [searchData, query, isMobileSearchOpen]);
+    }, [searchData, query, isMobileSearchOpen, isMenuOpen]);
 
-    // 3. Debounce & Fetch
     useEffect(() => {
         const timer = setTimeout(() => setDebouncedQuery(query), 400);
         return () => clearTimeout(timer);
@@ -60,7 +57,12 @@ export default function Navbar() {
         searchContent();
     }, [debouncedQuery]);
 
-    // UI Helper: The Results List Component
+    const navLinks = [
+        { to: "/", label: "Dashboard", icon: <LayoutDashboard size={18} /> },
+        { to: "/graph", label: "Graph", icon: <Share2 size={18} /> },
+        { to: "/collections", label: "Collections", icon: <Library size={18} /> },
+    ];
+
     const SearchResults = () => (
         <div className="absolute top-full left-0 mt-5 w-full bg-white border rounded-xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200 z-[100]">
             <div className="max-h-[60vh] md:max-h-[400px] overflow-y-auto p-2">
@@ -94,23 +96,66 @@ export default function Navbar() {
 
     return (
         <>
-            {/* BACKDROP BLUR */}
-            {((searchData && query) || isMobileSearchOpen) && (
+            {/* BACKDROP */}
+            {((searchData && query) || isMobileSearchOpen || isMenuOpen) && (
                 <div
                     className="fixed inset-0 z-[40] bg-black/20 backdrop-blur-md transition-all duration-500"
                     style={{ marginTop: '64px' }}
                     onClick={() => {
                         setSearchData(null);
                         setIsMobileSearchOpen(false);
+                        setIsMenuOpen(false);
                         setQuery("");
                     }}
                 />
             )}
 
+            {/* MOBILE SIDE MENU */}
+            <div className={`fixed top-16 left-0 h-[calc(100vh-64px)] w-64 bg-white z-[60] shadow-xl transform transition-transform duration-300 md:hidden ${isMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+                <nav className="flex flex-col p-4 gap-1">
+                    {navLinks.map(({ to, label, icon }) => (
+                        <NavLink
+                            key={to}
+                            to={to}
+                            onClick={() => setIsMenuOpen(false)}
+                            className={({ isActive }) =>
+                                `flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all ${isActive
+                                    ? 'bg-black text-white'
+                                    : 'text-gray-600 hover:bg-gray-100'
+                                }`
+                            }
+                        >
+                            {icon}
+                            {label}
+                        </NavLink>
+                    ))}
+                </nav>
+            </div>
+
+            {/* MOBILE SEARCH BAR */}
+            <div className={`fixed inset-x-0 top-0 h-16 bg-white z-[70] px-4 flex items-center transition-transform duration-300 md:hidden border-b ${isMobileSearchOpen ? 'translate-y-0' : '-translate-y-full'}`}>
+                <div className="flex items-center bg-gray-100 w-full px-4 py-2 rounded-xl relative">
+                    <Search size={18} className="text-gray-500 mr-2" />
+                    <input
+                        type="text"
+                        placeholder="Search..."
+                        className="bg-transparent outline-none text-sm w-full"
+                        autoFocus={isMobileSearchOpen}
+                        value={query}
+                        onChange={(e) => setQuery(e.target.value)}
+                    />
+                    <button onClick={() => { setIsMobileSearchOpen(false); setQuery(""); }}><X size={20} /></button>
+                    {searchData && query && <SearchResults />}
+                </div>
+            </div>
+
             <nav className="h-16 w-full bg-white border-b flex items-center justify-between px-4 md:px-8 sticky top-0 z-[50]">
-                {/* Logo Section */}
+                {/* Logo */}
                 <div className="flex items-center gap-3">
-                    <button className="md:hidden p-2 hover:bg-gray-100 rounded-lg" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+                    <button
+                        className="md:hidden p-2 hover:bg-gray-100 rounded-lg"
+                        onClick={() => setIsMenuOpen(!isMenuOpen)}
+                    >
                         {isMenuOpen ? <X size={20} /> : <Menu size={20} />}
                     </button>
                     <Link to="/" className="flex items-center gap-2">
@@ -119,25 +164,7 @@ export default function Navbar() {
                     </Link>
                 </div>
 
-                {/* MOBILE SEARCH BAR */}
-                <div className={`fixed inset-x-0 top-0 h-16 bg-white z-[70] px-4 flex items-center transition-transform duration-300 md:hidden border-b ${isMobileSearchOpen ? 'translate-y-0' : '-translate-y-full'}`}>
-                    <div className="flex items-center bg-gray-100 w-full px-4 py-2 rounded-xl relative">
-                        <Search size={18} className="text-gray-500 mr-2" />
-                        <input
-                            type="text"
-                            placeholder="Search..."
-                            className="bg-transparent outline-none text-sm w-full"
-                            autoFocus={isMobileSearchOpen}
-                            value={query}
-                            onChange={(e) => setQuery(e.target.value)}
-                        />
-                        <button onClick={() => { setIsMobileSearchOpen(false); setQuery(""); }}><X size={20} /></button>
-                        {/* MOBILE RESULTS */}
-                        {searchData && query && <SearchResults />}
-                    </div>
-                </div>
-
-                {/* DESKTOP SEARCH BAR */}
+                {/* DESKTOP SEARCH */}
                 <div className="hidden md:block relative w-[300px] lg:w-[420px]" ref={searchRef}>
                     <div className="flex items-center bg-gray-100 px-4 py-2 rounded-lg hover:bg-gray-200 transition focus-within:bg-white focus-within:ring-2 focus-within:ring-black/5">
                         <Search size={18} className="text-gray-500 mr-2" />
@@ -150,7 +177,6 @@ export default function Navbar() {
                         />
                         {isLoading && <Loader2 size={14} className="animate-spin text-gray-400" />}
                     </div>
-                    {/* DESKTOP RESULTS */}
                     {searchData && query && <SearchResults />}
                 </div>
 

@@ -52,7 +52,7 @@ const ContentDetail = () => {
 
     return (
         <div className="flex flex-col min-h-full w-full">
-            <div className=" md:p-8 max-w-5xl mx-auto w-full">
+            <div className="w-full md:p-8 max-w-7xl mx-auto">
 
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 w-full mb-8">
                     <div className="flex items-center gap-2 sm:gap-4 overflow-hidden">
@@ -84,7 +84,7 @@ const ContentDetail = () => {
                 </div>
 
                 <div className="bg-white rounded-[2rem] border border-gray-100 shadow-sm overflow-hidden">
-                    <div className="p-6 md:p-12">
+                    <div className="p-4 md:p-12">
                         <h1 className="text-3xl md:text-5xl font-black text-gray-900 leading-tight mb-8">
                             {content.title}
                         </h1>
