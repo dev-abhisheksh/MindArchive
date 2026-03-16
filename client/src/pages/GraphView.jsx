@@ -46,14 +46,14 @@ const GraphView = () => {
 
   if (loading) {
     return (
-      <div className="h-full flex items-center justify-center">
+      <div className="h-full flex items-center justify-center bg-white text-gray-800">
         Loading graph...
       </div>
     );
   }
 
   return (
-    <div className="w-full h-full bg-black">
+    <div className="w-full h-full bg-white">
       <ForceGraph3D
         ref={fgRef}
         graphData={graphData}
@@ -62,7 +62,8 @@ const GraphView = () => {
         linkDirectionalParticles={2}
         linkDirectionalParticleSpeed={0.004}
         linkWidth={1.5}
-        backgroundColor="#000000"
+        backgroundColor="#ffffff"
+        linkColor={() => "#d1d5db"}
         onNodeClick={(node) => navigate(`/content/${node.id}`)}
       />
     </div>
