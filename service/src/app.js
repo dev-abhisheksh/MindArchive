@@ -15,11 +15,18 @@ app.use(express.json());
 
 
 app.use(cors({
-  origin: [
-    "http://localhost:5173",
-    "https://mind-archive-gamma.vercel.app",
-    "chrome-extension://fincleegmippdgfbpojemenpjliammeg"
-  ],
+  origin: (origin, callback) => {
+    if (
+      !origin || // mobile/postman
+      origin.startsWith("chrome-extension://") ||
+      origin === "http://localhost:5173" ||
+      origin === "https://mind-archive-gamma.vercel.app"
+    ) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
   allowedHeaders: ["Content-Type", "Authorization"]
 }));
