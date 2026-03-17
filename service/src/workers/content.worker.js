@@ -32,7 +32,7 @@ const worker = new Worker("content-processing",
         const isYoutube = url.includes("youtube.com") || url.includes("youtu.be");
 
         if (isYoutube) {
-            summary = text;
+            summary = text.slice(0, 150);
         } else {
             summary = await summarizeText(text);
         }
