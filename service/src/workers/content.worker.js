@@ -1,6 +1,7 @@
 import dotenv from "dotenv";
 dotenv.config();
 
+import express from "express";
 import { Worker } from "bullmq";
 import redisClient from "../config/redisClient.js";
 import connectDB from "../config/db.js";
@@ -11,24 +12,40 @@ import { findRelatedContent } from "../services/related.service.js";
 import { RelatedContent } from "../models/relatedContent.model.js";
 import { summarizeText } from "../services/textSummary.service.js";
 
+// ✅ Dummy server (for Render free tier)
+const app = express();
+app.get("/", (req, res) => res.send("Worker running"));
+app.listen(10000, () => {
+    console.log("Dummy server running");
+});
+
 await connectDB();
 
 const worker = new Worker("content-processing",
     async (job) => {
-        console.log("Processing Content", job.data)
+        console.log("Processing Content", job.data);
 
         const { contentId, text, userId, url } = job.data;
+
         let summary;
         const isYoutube = url.includes("youtube.com") || url.includes("youtu.be");
+
         if (isYoutube) {
             summary = text;
         } else {
-            summary = await summarizeText(text)
+            summary = await summarizeText(text);
         }
 
         const embedding = await generateEmbedding(summary);
-        const tags = (await generateTagsWithAI(summary)).map(t => t.toLowerCase().trim());
-        await Content.findByIdAndUpdate(contentId, { embedding, tags, summary })
+
+        const tags = (await generateTagsWithAI(summary))
+            .map(t => t.toLowerCase().trim());
+
+        await Content.findByIdAndUpdate(contentId, {
+            embedding,
+            tags,
+            summary
+        });
 
         const relatedContent = await findRelatedContent(contentId, embedding, userId);
 
@@ -40,7 +57,7 @@ const worker = new Worker("content-processing",
                     relation: "semantic_similarity"
                 })
             )
-        )
+        );
 
         await Promise.all(
             relatedContent.map(related =>
@@ -51,9 +68,9 @@ const worker = new Worker("content-processing",
                 })
             )
         );
-
-    }, { connection: redisClient }
-)
+    },
+    { connection: redisClient }
+);
 
 worker.on("completed", job => {
     console.log("Job completed:", job.id);
@@ -62,5 +79,3 @@ worker.on("completed", job => {
 worker.on("failed", (job, err) => {
     console.error("Job failed:", job.id, err);
 });
-
-
