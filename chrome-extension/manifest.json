@@ -1,0 +1,11 @@
+{
+  "manifest_version": 3,
+  "name": "MindArchive Saver",
+  "version": "1.0",
+
+  "permissions": ["tabs", "activeTab", "scripting", "storage"],
+
+  "action": {
+    "default_popup": "popup.html"
+  }
+}

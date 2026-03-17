@@ -9,6 +9,7 @@ import { generateEmbedding } from "../services/embedding.service.js";
 import { generateTagsWithAI } from "../services/tagGeneration.service.js";
 import { findRelatedContent } from "../services/related.service.js";
 import { RelatedContent } from "../models/relatedContent.model.js";
+import { summarizeText } from "../services/textSummary.service.js";
 
 await connectDB();
 
@@ -16,9 +17,10 @@ const worker = new Worker("content-processing",
     async (job) => {
         console.log("Processing Content", job.data)
         const { contentId, text, userId } = job.data;
-        const embedding = await generateEmbedding(text);
-        const tags = (await generateTagsWithAI(text)).map(t => t.toLowerCase().trim());
-        await Content.findByIdAndUpdate(contentId, { embedding, tags })
+        const summary = await summarizeText(text)
+        const embedding = await generateEmbedding(summary);
+        const tags = (await generateTagsWithAI(summary)).map(t => t.toLowerCase().trim());
+        await Content.findByIdAndUpdate(contentId, { embedding, tags, text: summary })
 
         const relatedContent = await findRelatedContent(contentId, embedding, userId);
 
