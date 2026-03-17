@@ -105,7 +105,7 @@ const ContentDetail = () => {
 
                         <div className="prose prose-lg max-w-none">
                             <p className="text-gray-800 text-lg leading-relaxed whitespace-pre-line antialiased">
-                                {content.text}
+                                {content.summary}
                             </p>
                         </div>
 

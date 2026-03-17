@@ -32,7 +32,8 @@ const addContent = async (req, res) => {
         await contentQueue.add("process-content", {
             contentId: content._id,
             text: normalized.text,
-            userId
+            userId,
+            url: normalized.url
         })
 
         return res.status(201).json({ message: "Content added successfully", content })

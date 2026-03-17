@@ -16,11 +16,19 @@ await connectDB();
 const worker = new Worker("content-processing",
     async (job) => {
         console.log("Processing Content", job.data)
-        const { contentId, text, userId } = job.data;
-        const summary = await summarizeText(text)
+
+        const { contentId, text, userId, url } = job.data;
+        let summary;
+        const isYoutube = url.includes("youtube.com") || url.includes("youtu.be");
+        if (isYoutube) {
+            summary = text;
+        } else {
+            summary = await summarizeText(text)
+        }
+
         const embedding = await generateEmbedding(summary);
         const tags = (await generateTagsWithAI(summary)).map(t => t.toLowerCase().trim());
-        await Content.findByIdAndUpdate(contentId, { embedding, tags, text: summary })
+        await Content.findByIdAndUpdate(contentId, { embedding, tags, summary })
 
         const relatedContent = await findRelatedContent(contentId, embedding, userId);
 
@@ -37,7 +45,7 @@ const worker = new Worker("content-processing",
         await Promise.all(
             relatedContent.map(related =>
                 RelatedContent.create({
-                    from: related._id, 
+                    from: related._id,
                     to: contentId,
                     relation: "semantic_similarity"
                 })

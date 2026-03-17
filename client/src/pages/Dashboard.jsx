@@ -20,6 +20,7 @@ const Dashboard = () => {
             try {
                 const res = await fetchContent();
                 const fetchedData = res.data?.content || res.data || [];
+                console.log(res.data?.content)
                 setContent(Array.isArray(fetchedData) ? fetchedData : []);
             } catch (error) {
                 console.error("Failed to fetch:", error);
@@ -136,7 +137,7 @@ const Dashboard = () => {
                         </h3>
 
                         <p className="text-gray-600 text-sm line-clamp-3 mb-4 leading-relaxed">
-                            {item.text}
+                            {item.summary}
                         </p>
 
                         <div className="flex flex-wrap gap-2 pt-4 border-t border-gray-50">

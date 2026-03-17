@@ -28,6 +28,17 @@ const contentSchema = new mongoose.Schema({
         default: null
     },
 
+    summary: {
+        type: String,
+        maxlength: 1000
+    },
+
+    status: {
+        type: String,
+        enum: ["pending", "processed", "failed"],
+        default: "pending"
+    },
+
     createdAt: {
         type: Date,
         default: Date.now

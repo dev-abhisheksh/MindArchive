@@ -10,10 +10,7 @@ export const generateTagsWithAI = async (text) => {
                 {
                     role: "user",
                     content: `Generate EXACTLY 3 to 5 broad topic tags (1-2 words each).
-Return ONLY a JSON array.
-
-Example:
-["technology","backend","ai"]
+Return only comma-separated tags.
 
 Text:
 ${text.slice(0, 2000)}`
