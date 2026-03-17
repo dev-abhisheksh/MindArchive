@@ -17,7 +17,7 @@ const app = express();
 app.get("/", (req, res) => res.send("Worker running"));
 
 app.listen(process.env.PORT2, () => {
-    console.log("Dummy server running on", process.env.PORT);
+    console.log("Dummy server running on", process.env.PORT2);
 });
 
 await connectDB();
