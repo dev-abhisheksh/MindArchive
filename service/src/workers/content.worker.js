@@ -12,11 +12,12 @@ import { findRelatedContent } from "../services/related.service.js";
 import { RelatedContent } from "../models/relatedContent.model.js";
 import { summarizeText } from "../services/textSummary.service.js";
 
-// ✅ Dummy server (for Render free tier)
+
 const app = express();
 app.get("/", (req, res) => res.send("Worker running"));
-app.listen(10000, () => {
-    console.log("Dummy server running");
+
+app.listen(process.env.PORT2, () => {
+    console.log("Dummy server running on", process.env.PORT);
 });
 
 await connectDB();
