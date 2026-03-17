@@ -1,9 +1,9 @@
 import React, { useEffect, useState, useRef } from "react";
 import {
-    Search, Bell, BrainCircuit, Menu, X,
+    Search, LogOut, BrainCircuit, Menu, X,
     LayoutDashboard, Share2, Library, FileText, Loader2
-} from "lucide-react";
-import { Link, NavLink } from "react-router-dom";
+} from "lucide-react"; // Replaced Bell with LogOut
+import { Link, NavLink, useNavigate } from "react-router-dom"; // Added useNavigate
 import { semanticSearch } from "../api/search.api";
 
 export default function Navbar() {
@@ -14,6 +14,17 @@ export default function Navbar() {
     const [searchData, setSearchData] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
     const searchRef = useRef(null);
+    const navigate = useNavigate(); // Hook for redirection
+
+    // Logout Logic
+    const handleLogout = () => {
+        if (window.confirm("Are you sure you want to logout?")) {
+            localStorage.removeItem("token"); // Clear the token
+            // Optional: Clear other user data if stored
+            // localStorage.removeItem("user"); 
+            navigate("/login"); // Redirect to login page
+        }
+    };
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -129,6 +140,14 @@ export default function Navbar() {
                             {label}
                         </NavLink>
                     ))}
+                    {/* Logout in Mobile Menu */}
+                    <button
+                        onClick={handleLogout}
+                        className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-red-600 hover:bg-red-50 transition-all mt-4"
+                    >
+                        <LogOut size={18} />
+                        Logout
+                    </button>
                 </nav>
             </div>
 
@@ -181,9 +200,18 @@ export default function Navbar() {
                 </div>
 
                 {/* ACTIONS */}
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 md:gap-4">
                     <button className="md:hidden p-2" onClick={() => setIsMobileSearchOpen(true)}><Search size={20} /></button>
-                    <button className="p-2 relative"><Bell size={20} /><span className="absolute top-2.5 right-2.5 w-1.5 h-1.5 bg-red-500 rounded-full"></span></button>
+
+                    {/* Logout Button replacing Bell Icon */}
+                    <button
+                        onClick={handleLogout}
+                        className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                        title="Logout"
+                    >
+                        <LogOut size={20} />
+                    </button>
+
                     <div className="w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold text-xs">JD</div>
                 </div>
             </nav>
