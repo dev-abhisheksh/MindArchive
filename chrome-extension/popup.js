@@ -67,7 +67,7 @@ saveBtn.addEventListener("click", async () => {
                 : tab.title
         };
 
-        const res = await fetch("http://localhost:5000/api/content/create", {
+        const res = await fetch("https://mindarchive.onrender.com/api/content/create", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
