@@ -125,20 +125,32 @@ const ContentDetail = () => {
                     <div className="mt-16">
                         <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-400 mb-8 px-2">Related Discoveries</h3>
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {relatedContent.map((item) => (
-                                <div
-                                    key={item._id}
-                                    onClick={() => navigate(`/content/${item.to._id}`)}
-                                    className="group bg-white rounded-2xl border border-gray-100 p-6 hover:shadow-xl transition-all cursor-pointer"
-                                >
-                                    <span className={`text-[9px] uppercase font-black px-2 py-1 rounded mb-4 inline-block ${item.to.type === 'video' ? 'bg-red-50 text-red-600' : 'bg-emerald-50 text-emerald-600'
-                                        }`}>
-                                        {item.to.type}
-                                    </span>
-                                    <h4 className="font-bold text-gray-900 group-hover:text-indigo-600 line-clamp-2 mb-2">{item.to.title}</h4>
-                                    <p className="text-gray-500 text-xs line-clamp-2">{item.to.text}</p>
-                                </div>
-                            ))}
+                            {relatedContent
+                                ?.filter(item => item && item.to) // remove null / broken data
+                                .map((item) => (
+                                    <div
+                                        key={item?.to?._id}
+                                        onClick={() => navigate(`/content/${item?.to?._id}`)}
+                                        className="group bg-white rounded-2xl border border-gray-100 p-6 hover:shadow-xl transition-all cursor-pointer"
+                                    >
+                                        <span
+                                            className={`text-[9px] uppercase font-black px-2 py-1 rounded mb-4 inline-block ${item?.to?.type === "video"
+                                                    ? "bg-red-50 text-red-600"
+                                                    : "bg-emerald-50 text-emerald-600"
+                                                }`}
+                                        >
+                                            {item?.to?.type}
+                                        </span>
+
+                                        <h4 className="font-bold text-gray-900 group-hover:text-indigo-600 line-clamp-2 mb-2">
+                                            {item?.to?.title}
+                                        </h4>
+
+                                        <p className="text-gray-500 text-xs line-clamp-2">
+                                            {item?.to?.text}
+                                        </p>
+                                    </div>
+                                ))}
                         </div>
                     </div>
                 )}

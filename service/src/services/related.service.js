@@ -22,7 +22,7 @@ export const findRelatedContent = async (contentId, embedding, userId) => {
                 $match: {
                     _id: { $ne: new mongoose.Types.ObjectId(contentId) },
                     userId: new mongoose.Types.ObjectId(userId),
-                    score: { $gte: 0.78 }
+                    score: { $gte: 0.8 }
                 }
             },
             { $limit: 10 }
