@@ -1,6 +1,7 @@
 import { Content } from "../models/content.model.js";
 import { contentQueue } from "../queues/content.queue.js";
 import { generateTagsWithAI } from "../services/tagGeneration.service.js";
+import { getTimeAgo } from "../utils/resurface.util.js";
 
 
 const addContent = async (req, res) => {
@@ -50,7 +51,12 @@ const getMyContent = async (req, res) => {
             .select("-__v -embedding")
             .sort({ createdAt: -1 });
 
-        return res.status(200).json({ content: myContent })
+        const contentWithTimeAgoo = myContent.map(content => ({
+            ...content.toObject(),
+            timeAgo: getTimeAgo(content.createdAt)
+        }));
+
+        return res.status(200).json({ content: contentWithTimeAgoo })
     } catch (error) {
         console.error("Error fetching my content:", error);
         return res.status(500).json({ message: "Internal server error" });
