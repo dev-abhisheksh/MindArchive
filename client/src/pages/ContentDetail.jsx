@@ -5,6 +5,7 @@ import Button from "../components/Button";
 import { fetchRelatedContents } from "../api/relatedContent.api";
 import Loader from "../components/ui/Loader";
 
+
 const ContentDetail = () => {
     const [content, setContent] = useState(null);
     const [relatedContent, setRelatedContent] = useState([]);
