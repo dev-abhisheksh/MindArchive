@@ -11,10 +11,13 @@ const ContentDetail = () => {
     const [relatedContent, setRelatedContent] = useState([]);
     const { id } = useParams();
     const navigate = useNavigate();
+    const [loading, setLoading] = useState(true)
 
     useEffect(() => {
         setContent(null);
         setRelatedContent([]);
+        setLoading(true);
+
 
         const fetchContentDetail = async () => {
             try {
@@ -24,6 +27,7 @@ const ContentDetail = () => {
             } catch (error) {
                 console.error(error);
             }
+            finally { setLoading(false) }
         };
 
         const allRelatedContents = async () => {
@@ -32,6 +36,8 @@ const ContentDetail = () => {
                 setRelatedContent(res.data);
             } catch (error) {
                 console.error(error);
+            } finally {
+                setLoading(false)
             }
         };
 
