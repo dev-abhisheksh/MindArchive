@@ -40,11 +40,10 @@ const Dashboard = () => {
             return;
         }
 
-        // Calculate position from the button so the portal dropdown lands in the right spot
         const rect = e.currentTarget.getBoundingClientRect();
         setMenuPos({
             top: rect.bottom + window.scrollY + 8,
-            left: rect.right + window.scrollX - 224, // 224 = w-56
+            left: rect.right + window.scrollX - 224,
         });
         setActiveMenu(contentId);
 
@@ -88,10 +87,10 @@ const Dashboard = () => {
         <div className="max-w-6xl mx-auto p-4 md:p-6">
             <header className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
                 <div>
-                    <h2 className="text-2xl md:text-3xl font-bold capitalize text-gray-900">
+                    <h2 className="text-2xl md:text-3xl font-bold capitalize text-text-primary">
                         {filter === 'all' ? 'Your Library' : `${filter}s`}
                     </h2>
-                    <p className="text-gray-500 mt-1 text-sm md:text-base">
+                    <p className="text-text-muted mt-1 text-sm md:text-base">
                         Found {filteredContent.length} resources
                     </p>
                 </div>
@@ -103,7 +102,7 @@ const Dashboard = () => {
                             onClick={() => setFilter(cat)}
                             className={`px-5 py-2 rounded-full text-sm font-semibold capitalize whitespace-nowrap transition-all border shadow-sm ${filter === cat
                                 ? 'bg-indigo-600 text-white border-indigo-600'
-                                : 'bg-white text-gray-600 border-gray-200 hover:border-indigo-300'
+                                : 'bg-bg-card text-text-secondary border-border-theme hover:border-indigo-300'
                                 }`}
                         >
                             {cat}
@@ -117,7 +116,7 @@ const Dashboard = () => {
                     <div
                         key={item._id}
                         onClick={() => navigate(`/content/${item._id}`)}
-                        className="group bg-white rounded-2xl border border-gray-200 p-5 shadow-sm hover:shadow-md transition-all cursor-pointer active:scale-[0.98] md:hover:-translate-y-1 relative"
+                        className="group bg-bg-card rounded-2xl border border-border-theme p-5 shadow-sm hover:shadow-md transition-all cursor-pointer active:scale-[0.98] md:hover:-translate-y-1 relative"
                     >
                         <div className="flex items-center justify-between mb-4">
                             <span className={`text-[10px] uppercase tracking-widest font-bold px-2.5 py-1 rounded-md ${item.type === 'video' ? 'bg-red-50 text-red-600' : 'bg-emerald-50 text-emerald-600'}`}>
@@ -126,31 +125,31 @@ const Dashboard = () => {
 
                             <button
                                 onClick={(e) => handleOpenMenu(e, item._id)}
-                                className="p-1.5 hover:bg-gray-100 rounded-full transition-colors"
+                                className="p-1.5 hover:bg-bg-hover rounded-full transition-colors"
                             >
-                                <MoreVertical size={18} className="text-gray-400 group-hover:text-gray-600" />
+                                <MoreVertical size={18} className="text-text-muted group-hover:text-text-secondary" />
                             </button>
                         </div>
 
-                        <h3 className="text-lg font-bold leading-tight mb-2 group-hover:text-indigo-600 transition-colors line-clamp-2">
+                        <h3 className="text-lg font-bold leading-tight mb-2 text-text-primary group-hover:text-indigo-600 transition-colors line-clamp-2">
                             {item.title}
                         </h3>
 
-                        <p className="text-gray-600 text-sm line-clamp-3 mb-4 leading-relaxed">
+                        <p className="text-text-secondary text-sm line-clamp-3 mb-4 leading-relaxed">
                             {item.summary}
                         </p>
 
-                        <div className="flex flex-wrap gap-2 pt-4 border-t border-gray-50">
+                        <div className="flex flex-wrap gap-2 pt-4 border-t border-border-light">
                             {item.tags?.map((tag, idx) => (
-                                <span key={idx} className="text-[11px] font-bold text-indigo-500 uppercase">
+                                <span key={idx} className="text-[11px] font-bold text-accent-text uppercase">
                                     #{tag}
                                 </span>
                             ))}
                         </div>
 
-                        <div  className='absolute bottom-3 right-3 bg-white px-2 py-0.5 rounded-full border border-gray-300 text-xs text-gray-500  hover:scale-105 transition-all'>
+                        <div className='absolute bottom-3 right-3 bg-bg-card px-2 py-0.5 rounded-full border border-border-theme text-xs text-text-muted hover:scale-105 transition-all'>
                             {item.timeAgo && (
-                                <p className="text-xs text-black">
+                                <p className="text-xs text-text-primary">
                                     {item.timeAgo}
                                 </p>
                             )}
@@ -159,7 +158,7 @@ const Dashboard = () => {
                 ))}
             </div>
 
-            {/* Dropdown rendered via portal directly into body — no z-index or overflow conflicts */}
+            {/* Dropdown rendered via portal */}
             {activeMenu && createPortal(
                 <>
                     {/* Backdrop */}
@@ -171,9 +170,9 @@ const Dashboard = () => {
                     <div
                         style={{ top: menuPos.top, left: menuPos.left }}
                         onClick={(e) => e.stopPropagation()}
-                        className="absolute z-50 w-56 bg-white border border-gray-100 rounded-xl shadow-xl overflow-hidden py-2 animate-in fade-in slide-in-from-top-2"
+                        className="absolute z-50 w-56 bg-bg-card border border-border-theme rounded-xl shadow-xl overflow-hidden py-2 animate-in fade-in slide-in-from-top-2"
                     >
-                        <div className="px-4 py-2 text-[10px] font-bold text-gray-400 uppercase border-b border-gray-50 flex items-center gap-2">
+                        <div className="px-4 py-2 text-[10px] font-bold text-text-muted uppercase border-b border-border-light flex items-center gap-2">
                             <FolderPlus size={12} /> Add to collection
                         </div>
                         <div className="max-h-48 overflow-y-auto">
@@ -182,14 +181,14 @@ const Dashboard = () => {
                                     key={col._id}
                                     type="button"
                                     onClick={(e) => handleAddToCollection(e, activeMenu, col._id)}
-                                    className="w-full text-left px-4 py-2 text-sm text-gray-600 hover:bg-indigo-50 hover:text-indigo-600 transition-colors flex justify-between items-center"
+                                    className="w-full text-left px-4 py-2 text-sm text-text-secondary hover:bg-accent-light hover:text-accent-text transition-colors flex justify-between items-center"
                                 >
                                     <span className="truncate">{col.name}</span>
                                     {isAdding === activeMenu && <Loader2 size={12} className="animate-spin" />}
                                 </button>
                             ))}
                             {collections.length === 0 && (
-                                <div className="px-4 py-3 text-xs text-gray-400 italic">No collections found</div>
+                                <div className="px-4 py-3 text-xs text-text-muted italic">No collections found</div>
                             )}
                         </div>
                     </div>

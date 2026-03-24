@@ -7,6 +7,14 @@
     <title>MindArchive</title>
   </head>
   <body>
+    <script>
+      // Anti-flicker: set theme before React renders
+      (function() {
+        var saved = localStorage.getItem('theme');
+        var theme = saved || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', theme);
+      })();
+    </script>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>

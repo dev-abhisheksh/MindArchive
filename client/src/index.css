@@ -1,1 +1,126 @@
 @import "tailwindcss";
+
+/* ===== THEME SYSTEM ===== */
+
+/* Light Theme (Default) */
+:root {
+  --bg-primary: #ffffff;
+  --bg-secondary: #f9fafb;
+  --bg-card: #ffffff;
+  --bg-hover: #f3f4f6;
+  --bg-input: #f3f4f6;
+  --bg-input-focus: #ffffff;
+  --bg-elevated: #ffffff;
+  --text-primary: #111827;
+  --text-secondary: #4b5563;
+  --text-muted: #9ca3af;
+  --text-inverted: #ffffff;
+  --border-color: #e5e7eb;
+  --border-light: #f3f4f6;
+  --shadow-color: rgba(0, 0, 0, 0.04);
+  --shadow-strong: rgba(0, 0, 0, 0.08);
+  --accent-primary: #4f46e5;
+  --accent-primary-light: #eef2ff;
+  --accent-primary-text: #4338ca;
+  --backdrop-color: rgba(0, 0, 0, 0.2);
+  --graph-bg: #ffffff;
+  --graph-link: #d1d5db;
+}
+
+/* Dark Theme */
+[data-theme="dark"] {
+  --bg-primary: #141414;
+  --bg-secondary: #1a1a1a;
+  --bg-card: #1f1f1f;
+  --bg-hover: #2a2a2a;
+  --bg-input: #252525;
+  --bg-input-focus: #2e2e2e;
+  --bg-elevated: #222222;
+  --text-primary: #e5e5e5;
+  --text-secondary: #a3a3a3;
+  --text-muted: #6b6b6b;
+  --text-inverted: #141414;
+  --border-color: #303030;
+  --border-light: #262626;
+  --shadow-color: rgba(0, 0, 0, 0.35);
+  --shadow-strong: rgba(0, 0, 0, 0.55);
+  --accent-primary: #6366f1;
+  --accent-primary-light: #27272a;
+  --accent-primary-text: #a5b4fc;
+  --backdrop-color: rgba(0, 0, 0, 0.55);
+  --graph-bg: #141414;
+  --graph-link: #4a4a4a;
+}
+
+/* Register Tailwind v4 theme tokens */
+@theme {
+  --color-bg-primary: var(--bg-primary);
+  --color-bg-secondary: var(--bg-secondary);
+  --color-bg-card: var(--bg-card);
+  --color-bg-hover: var(--bg-hover);
+  --color-bg-input: var(--bg-input);
+  --color-bg-input-focus: var(--bg-input-focus);
+  --color-bg-elevated: var(--bg-elevated);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
+  --color-text-inverted: var(--text-inverted);
+  --color-border-theme: var(--border-color);
+  --color-border-light: var(--border-light);
+  --color-accent-primary: var(--accent-primary);
+  --color-accent-light: var(--accent-primary-light);
+  --color-accent-text: var(--accent-primary-text);
+  --color-backdrop: var(--backdrop-color);
+}
+
+/* ===== SMOOTH THEME TRANSITIONS ===== */
+/* Only apply during theme toggle — does NOT interfere with Tailwind hover effects */
+.theme-transitioning,
+.theme-transitioning *,
+.theme-transitioning *::before,
+.theme-transitioning *::after {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease !important;
+}
+
+/* Keep Tailwind spin/pulse animations working during theme switch */
+.theme-transitioning .animate-spin,
+.theme-transitioning .animate-pulse {
+  transition: none !important;
+}
+
+/* ===== THEME TOGGLE ANIMATION ===== */
+.theme-toggle-btn {
+  position: relative;
+  overflow: hidden;
+}
+
+.theme-toggle-btn svg {
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+}
+
+.theme-toggle-btn:hover svg {
+  transform: rotate(30deg) scale(1.1);
+}
+
+.theme-toggle-btn:active svg {
+  transform: rotate(60deg) scale(0.95);
+}
+
+/* ===== SCROLLBAR THEMING ===== */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--text-muted);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-secondary);
+}

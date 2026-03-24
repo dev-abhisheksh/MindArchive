@@ -30,7 +30,7 @@ const DetailedCollection = () => {
   )
 
   if (!collection) return (
-    <div className="flex h-full items-center justify-center text-gray-400">
+    <div className="flex h-full items-center justify-center text-text-muted">
       Collection not found.
     </div>
   )
@@ -41,25 +41,25 @@ const DetailedCollection = () => {
       {/* Back */}
       <button
         onClick={() => navigate(-1)}
-        className="p-2 hover:bg-gray-200 rounded-full transition-colors flex-none pb-3"
+        className="p-2 hover:bg-bg-hover rounded-full transition-colors flex-none pb-3"
       >
-        <svg className="w-5 h-5 sm:w-6 sm:h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg className="w-5 h-5 sm:w-6 sm:h-6 text-text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
         </svg>
       </button>
 
       {/* Header */}
-      <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm mb-6">
+      <div className="bg-bg-card border border-border-theme rounded-2xl p-6 shadow-sm mb-6">
         <div className="flex items-center gap-4">
-          <div className="p-3 bg-indigo-50 text-indigo-600 rounded-xl">
+          <div className="p-3 bg-accent-light text-accent-text rounded-xl">
             <Layers size={24} />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">{collection.name}</h1>
-            <p className="text-gray-500 text-sm mt-0.5">{collection.description || 'No description provided.'}</p>
+            <h1 className="text-2xl font-bold text-text-primary">{collection.name}</h1>
+            <p className="text-text-muted text-sm mt-0.5">{collection.description || 'No description provided.'}</p>
           </div>
         </div>
-        <div className="mt-4 pt-4 border-t border-gray-50 text-xs text-gray-400">
+        <div className="mt-4 pt-4 border-t border-border-light text-xs text-text-muted">
           {collection.contents?.length || 0} items · Created {new Date(collection.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
         </div>
       </div>
@@ -67,7 +67,7 @@ const DetailedCollection = () => {
       {/* Contents */}
       <div className="space-y-3">
         {collection.contents?.length === 0 && (
-          <div className="text-center py-16 text-gray-400 text-sm">
+          <div className="text-center py-16 text-text-muted text-sm">
             No contents in this collection yet.
           </div>
         )}
@@ -76,19 +76,19 @@ const DetailedCollection = () => {
           <div
             key={item._id}
             onClick={() => navigate(`/content/${item._id}`)}
-            className="group bg-white border border-gray-200 rounded-2xl p-4 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all cursor-pointer flex items-center justify-between gap-4"
+            className="group bg-bg-card border border-border-theme rounded-2xl p-4 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all cursor-pointer flex items-center justify-between gap-4"
           >
             <div className="flex items-center gap-4 min-w-0">
               <div className={`p-2 rounded-lg shrink-0 ${item.type === 'video' ? 'bg-red-50 text-red-500' : 'bg-emerald-50 text-emerald-600'}`}>
                 {item.type === 'video' ? <Video size={16} /> : <FileText size={16} />}
               </div>
               <div className="min-w-0">
-                <h3 className="text-sm font-semibold text-gray-800 group-hover:text-indigo-600 transition-colors truncate">
+                <h3 className="text-sm font-semibold text-text-primary group-hover:text-indigo-600 transition-colors truncate">
                   {item.title}
                 </h3>
                 <div className="flex flex-wrap gap-1.5 mt-1">
                   {item.tags?.map((tag, idx) => (
-                    <span key={idx} className="text-[10px] font-bold text-indigo-400 uppercase">#{tag}</span>
+                    <span key={idx} className="text-[10px] font-bold text-accent-text uppercase">#{tag}</span>
                   ))}
                 </div>
               </div>
@@ -99,7 +99,7 @@ const DetailedCollection = () => {
               target="_blank"
               rel="noopener noreferrer"
               onClick={(e) => e.stopPropagation()}
-              className="shrink-0 p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-400 hover:text-gray-600"
+              className="shrink-0 p-2 hover:bg-bg-hover rounded-lg transition-colors text-text-muted hover:text-text-secondary"
             >
               <ExternalLink size={15} />
             </a>

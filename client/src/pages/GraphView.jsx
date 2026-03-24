@@ -2,12 +2,14 @@ import React, { useEffect, useState, useRef } from "react";
 import ForceGraph3D from "react-force-graph-3d";
 import { useNavigate } from "react-router-dom";
 import { fetchGraph } from "../api/graph.api";
+import { useTheme } from "../hooks/useTheme";
 
 const GraphView = () => {
   const [graphData, setGraphData] = useState({ nodes: [], links: [] });
   const [loading, setLoading] = useState(true);
   const fgRef = useRef();
   const navigate = useNavigate();
+  const { theme } = useTheme();
 
   useEffect(() => {
     const getGraph = async () => {
@@ -46,14 +48,17 @@ const GraphView = () => {
 
   if (loading) {
     return (
-      <div className="h-full flex items-center justify-center bg-white text-gray-800">
+      <div className="h-full flex items-center justify-center text-text-secondary">
         Loading graph...
       </div>
     );
   }
 
+  const graphBg = theme === 'dark' ? '#121212' : '#ffffff';
+  const linkColor = theme === 'dark' ? '#4a4a60' : '#d1d5db';
+
   return (
-    <div className="w-full h-full bg-white">
+    <div className="w-full h-full">
       <ForceGraph3D
         ref={fgRef}
         graphData={graphData}
@@ -62,8 +67,8 @@ const GraphView = () => {
         linkDirectionalParticles={2}
         linkDirectionalParticleSpeed={0.004}
         linkWidth={1.5}
-        backgroundColor="#ffffff"
-        linkColor={() => "#d1d5db"}
+        backgroundColor={graphBg}
+        linkColor={() => linkColor}
         onNodeClick={(node) => navigate(`/content/${node.id}`)}
       />
     </div>

@@ -1,16 +1,16 @@
-import { Link, NavLink } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 
 export default function Sidebar() {
 
     const navLinkStyles = ({isActive}) => 
         `py-3 px-2 rounded transition-colors ${
             isActive
-            ? "bg-black text-white font-medium"
-            : "text-gray-700 hover:bg-gray-100"
+            ? "bg-accent-primary text-white font-medium"
+            : "text-text-secondary hover:bg-bg-hover"
         }`
 
     return (
-        <aside className="w-64 bg-white border-r h-[calc(100vh-64px)] p-4">
+        <aside className="w-64 bg-bg-primary border-r border-border-theme h-[calc(100vh-64px)] p-4">
             <nav className="flex flex-col gap-2">
 
                 <NavLink to="/" className={navLinkStyles}>

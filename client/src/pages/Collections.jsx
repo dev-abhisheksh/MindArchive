@@ -68,8 +68,8 @@ const Collections = () => {
   return (
     <div className="max-w-6xl mx-auto p-4 md:p-6">
       <header className="mb-10">
-        <h1 className="text-3xl font-bold text-gray-900">Your Collections</h1>
-        <p className="text-gray-500 mt-1">Organized groups of your saved knowledge.</p>
+        <h1 className="text-3xl font-bold text-text-primary">Your Collections</h1>
+        <p className="text-text-muted mt-1">Organized groups of your saved knowledge.</p>
       </header>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 relative">
@@ -78,12 +78,12 @@ const Collections = () => {
             onClick={() => navigate(`/collections/${collection._id}`)}
             className="group cursor-pointer">
             <div className="relative mb-4">
-              <div className="absolute inset-0 bg-indigo-100 rounded-2xl transform translate-x-2 translate-y-2 group-hover:translate-x-3 group-hover:translate-y-3 transition-transform duration-300"></div>
-              <div className="absolute inset-0 bg-white border border-gray-200 rounded-2xl transform translate-x-1 translate-y-1 group-hover:translate-x-1.5 group-hover:translate-y-1.5 transition-transform duration-300 shadow-sm"></div>
+              <div className="absolute inset-0 bg-accent-light rounded-2xl transform translate-x-2 translate-y-2 group-hover:translate-x-3 group-hover:translate-y-3 transition-transform duration-300"></div>
+              <div className="absolute inset-0 bg-bg-card border border-border-theme rounded-2xl transform translate-x-1 translate-y-1 group-hover:translate-x-1.5 group-hover:translate-y-1.5 transition-transform duration-300 shadow-sm"></div>
 
-              <div className="relative bg-white border border-gray-200 rounded-2xl p-5 shadow-sm min-h-[160px] flex flex-col justify-between overflow-hidden">
+              <div className="relative bg-bg-card border border-border-theme rounded-2xl p-5 shadow-sm min-h-[160px] flex flex-col justify-between overflow-hidden">
                 <div className="flex justify-between items-start">
-                  <div className="p-2 bg-indigo-50 text-indigo-600 rounded-lg">
+                  <div className="p-2 bg-accent-light text-accent-text rounded-lg">
                     <Layers size={20} />
                   </div>
                   <button
@@ -91,37 +91,36 @@ const Collections = () => {
                       e.stopPropagation()
                       setOpenOptionModal(openOptioNModal === collection._id ? null : collection._id)
                     }}
-                    className="text-gray-400 hover:text-gray-600">
+                    className="text-text-muted hover:text-text-secondary">
                     <MoreVertical size={18} />
                   </button>
                 </div>
 
                 <div className="mt-4">
-                  <h3 className="text-xl font-bold text-gray-900 group-hover:text-indigo-600 transition-colors">
+                  <h3 className="text-xl font-bold text-text-primary group-hover:text-indigo-600 transition-colors">
                     {collection.name}
                   </h3>
-                  <p className="text-gray-500 text-sm line-clamp-1 mt-1">
+                  <p className="text-text-muted text-sm line-clamp-1 mt-1">
                     {collection.description || "No description provided."}
                   </p>
                 </div>
 
-                {/* FIX 3: Optional chain so it doesn't crash when previewContents is undefined */}
                 <div className="mt-4 space-y-1">
                   {collection.previewContents?.slice(0, 2).map((content, idx) => (
-                    <div key={content._id || idx} className="text-[11px] text-gray-400 flex items-center gap-2 truncate">
-                      <div className="w-1 h-1 rounded-full bg-gray-300"></div>
+                    <div key={content._id || idx} className="text-[11px] text-text-muted flex items-center gap-2 truncate">
+                      <div className="w-1 h-1 rounded-full bg-text-muted"></div>
                       {content.title}
                     </div>
                   ))}
                   {collection.previewContents?.length > 2 && (
-                    <span className="text-[10px] text-indigo-400 font-bold uppercase tracking-wider">
+                    <span className="text-[10px] text-accent-text font-bold uppercase tracking-wider">
                       +{collection.previewContents.length - 2} more items
                     </span>
                   )}
 
                   {openOptioNModal === collection._id && (
-                    <div className="absolute top-10 right-3 w-44 bg-white border border-gray-100 rounded-xl shadow-xl z-50 overflow-hidden py-2">
-                      <div className="px-4 py-2 text-[10px] font-bold text-gray-400 uppercase border-b border-gray-50">
+                    <div className="absolute top-10 right-3 w-44 bg-bg-card border border-border-theme rounded-xl shadow-xl z-50 overflow-hidden py-2">
+                      <div className="px-4 py-2 text-[10px] font-bold text-text-muted uppercase border-b border-border-light">
                         Options
                       </div>
                       <button
@@ -133,7 +132,7 @@ const Collections = () => {
                           setName(collection.name)
                           setDescription(collection.description)
                         }}
-                        className="w-full text-left px-4 py-2 text-sm text-gray-600 hover:bg-indigo-50 hover:text-indigo-600 transition-colors flex items-center gap-2"
+                        className="w-full text-left px-4 py-2 text-sm text-text-secondary hover:bg-accent-light hover:text-accent-text transition-colors flex items-center gap-2"
                       >
                         <Pencil size={13} /> Edit
                       </button>
@@ -148,34 +147,34 @@ const Collections = () => {
                 </div>
 
                 {isUpdateModalOpen && (
-                  <div className='fixed inset-0 z-50 flex items-center justify-center bg-gray-900/20 backdrop-blur-sm animate-in fade-in duration-200'>
-                    <div className='bg-white p-6 rounded-2xl shadow-2xl w-[90%] max-w-sm border border-gray-100 flex flex-col'>
+                  <div className='fixed inset-0 z-50 flex items-center justify-center bg-backdrop backdrop-blur-sm animate-in fade-in duration-200'>
+                    <div className='bg-bg-card p-6 rounded-2xl shadow-2xl w-[90%] max-w-sm border border-border-theme flex flex-col'>
 
                       <div className="flex justify-between items-center mb-6">
-                        <h2 className="text-xl font-bold text-gray-900">Edit Collection</h2>
+                        <h2 className="text-xl font-bold text-text-primary">Edit Collection</h2>
                         <button
                           onClick={() => setIsUpdateModalOpen(false)}
-                          className="p-1 hover:bg-gray-100 rounded-lg transition-colors"
+                          className="p-1 hover:bg-bg-hover rounded-lg transition-colors"
                         >
-                          <X size={20} className="text-gray-400" />
+                          <X size={20} className="text-text-muted" />
                         </button>
                       </div>
 
                       <div className="space-y-4">
                         <div>
-                          <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Name</label>
+                          <label className="block text-xs font-bold text-text-muted uppercase tracking-wider mb-1">Name</label>
                           <input
                             value={name}
                             onChange={(e) => setName(e.target.value)}
-                            className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
+                            className="w-full px-4 py-3 bg-bg-input border border-border-theme rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 transition-all text-text-primary"
                           />
                         </div>
                         <div>
-                          <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Description</label>
+                          <label className="block text-xs font-bold text-text-muted uppercase tracking-wider mb-1">Description</label>
                           <textarea
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
-                            className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 transition-all resize-none"
+                            className="w-full px-4 py-3 bg-bg-input border border-border-theme rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 transition-all resize-none text-text-primary"
                             rows={3}
                           />
                         </div>
@@ -184,7 +183,7 @@ const Collections = () => {
                       <div className="flex gap-3 mt-8">
                         <button
                           onClick={() => setIsUpdateModalOpen(false)}
-                          className="flex-1 py-3 text-sm font-semibold text-gray-600 hover:bg-gray-50 rounded-xl transition-colors"
+                          className="flex-1 py-3 text-sm font-semibold text-text-secondary hover:bg-bg-hover rounded-xl transition-colors"
                         >
                           Cancel
                         </button>
@@ -207,8 +206,8 @@ const Collections = () => {
 
         <button
           onClick={() => setCreateCollectionModalOpen(true)}
-          className="border-2 border-dashed border-gray-200 rounded-2xl p-6 flex flex-col items-center justify-center text-gray-400 hover:border-indigo-300 hover:text-indigo-500 transition-all min-h-[220px]">
-          <div className="p-3 bg-gray-50 rounded-full mb-3">
+          className="border-2 border-dashed border-border-theme rounded-2xl p-6 flex flex-col items-center justify-center text-text-muted hover:border-indigo-300 hover:text-indigo-500 transition-all min-h-[220px]">
+          <div className="p-3 bg-bg-hover rounded-full mb-3">
             <FolderOpen size={24} />
           </div>
           <span className="font-medium">New Collection</span>
@@ -217,39 +216,37 @@ const Collections = () => {
 
       </div>
 
-      {/* FIX 2: Moved outside the grid, changed absolute → fixed so it covers the full viewport */}
       {
         createCollectionModalOpen && (
-          <div className='fixed inset-0 z-50 flex items-center justify-center bg-gray-900/20 backdrop-blur-sm animate-in fade-in duration-200'>
-            <div className='bg-white p-6 rounded-2xl shadow-2xl w-[90%] max-w-sm border border-gray-100 flex flex-col'>
+          <div className='fixed inset-0 z-50 flex items-center justify-center bg-backdrop backdrop-blur-sm animate-in fade-in duration-200'>
+            <div className='bg-bg-card p-6 rounded-2xl shadow-2xl w-[90%] max-w-sm border border-border-theme flex flex-col'>
               <div className="flex justify-between items-center mb-6">
-                <h2 className="text-xl font-bold text-gray-900">New Collection</h2>
+                <h2 className="text-xl font-bold text-text-primary">New Collection</h2>
                 <button
                   onClick={() => setCreateCollectionModalOpen(false)}
-                  className="p-1 hover:bg-gray-100 rounded-lg transition-colors"
+                  className="p-1 hover:bg-bg-hover rounded-lg transition-colors"
                 >
-                  <X size={20} className="text-gray-400" />
+                  <X size={20} className="text-text-muted" />
                 </button>
               </div>
 
               <div className="space-y-4">
                 <div>
-                  <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Name</label>
-                  {/* FIX 1: Controlled inputs wired to state */}
+                  <label className="block text-xs font-bold text-text-muted uppercase tracking-wider mb-1">Name</label>
                   <input
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
+                    className="w-full px-4 py-3 bg-bg-input border border-border-theme rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 transition-all text-text-primary"
                     placeholder="e.g. Design Inspiration"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Description</label>
+                  <label className="block text-xs font-bold text-text-muted uppercase tracking-wider mb-1">Description</label>
                   <textarea
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
-                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 transition-all resize-none"
+                    className="w-full px-4 py-3 bg-bg-input border border-border-theme rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 transition-all resize-none text-text-primary"
                     placeholder="What's this for?"
                     rows={3}
                   />
@@ -259,7 +256,7 @@ const Collections = () => {
               <div className="flex gap-3 mt-8">
                 <button
                   onClick={() => setCreateCollectionModalOpen(false)}
-                  className="flex-1 py-3 text-sm font-semibold text-gray-600 hover:bg-gray-50 rounded-xl transition-colors"
+                  className="flex-1 py-3 text-sm font-semibold text-text-secondary hover:bg-bg-hover rounded-xl transition-colors"
                 >
                   Cancel
                 </button>
