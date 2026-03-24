@@ -147,6 +147,14 @@ const Dashboard = () => {
                                 </span>
                             ))}
                         </div>
+
+                        <div  className='absolute bottom-3 right-3 bg-white px-2 py-0.5 rounded-full border border-gray-300 text-xs text-gray-500  hover:scale-105 transition-all'>
+                            {item.timeAgo && (
+                                <p className="text-xs text-black">
+                                    {item.timeAgo}
+                                </p>
+                            )}
+                        </div>
                     </div>
                 ))}
             </div>

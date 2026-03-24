@@ -18,6 +18,7 @@ const ContentDetail = () => {
             try {
                 const res = await contentById(id);
                 setContent(res.data.content || res.data);
+                console.log(res.data.content)
             } catch (error) {
                 console.error(error);
             }
@@ -112,6 +113,11 @@ const ContentDetail = () => {
                         <footer className="mt-16 pt-8 border-t border-gray-50 flex flex-col sm:flex-row items-center justify-between gap-4">
                             <div className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">
                                 Saved {new Date(content.createdAt).toLocaleDateString(undefined, { dateStyle: 'long' })}
+                                {content.timeAgo && (
+                                    <p className="text-xs text-gray-500 ml-2">
+                                        ({content.timeAgo})
+                                    </p>
+                                )}
                             </div>
                             <div className="flex gap-6">
                                 <button className="text-gray-400 hover:text-red-500 text-[10px] font-bold uppercase tracking-widest transition-colors">Delete</button>
@@ -148,6 +154,14 @@ const ContentDetail = () => {
 
                                         <p className="text-gray-500 text-xs line-clamp-2">
                                             {item?.to?.text}
+                                        </p>
+
+                                        <p>
+                                            {item.timeAgo && (
+                                                <span className="text-xs text-gray-400">
+                                                    Saved {item.to.timeAgo}
+                                                </span>
+                                            )}
                                         </p>
                                     </div>
                                 ))}

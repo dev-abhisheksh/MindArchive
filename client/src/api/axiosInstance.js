@@ -3,7 +3,7 @@ import axios from 'axios';
 const getToken = () => localStorage.getItem('token');
 
 const API = axios.create({
-    baseURL: 'https://mindarchive.onrender.com',
+    baseURL: 'http://localhost:5000',
 })
 
 API.interceptors.request.use((config) => {

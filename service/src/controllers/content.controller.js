@@ -114,9 +114,13 @@ const contentById = async (req, res) => {
             return res.status(404).json({ message: "Content not found" });
         }
 
+        const contentObj = content.toObject();
+
+        contentObj.timeAgo = getTimeAgo(content.createdAt);
+
         return res.status(200).json({
             success: true,
-            content
+            content: contentObj
         });
 
     } catch (error) {
