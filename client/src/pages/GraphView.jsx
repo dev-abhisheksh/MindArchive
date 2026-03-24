@@ -3,6 +3,7 @@ import ForceGraph3D from "react-force-graph-3d";
 import { useNavigate } from "react-router-dom";
 import { fetchGraph } from "../api/graph.api";
 import { useTheme } from "../hooks/useTheme";
+import Loader from "../components/ui/Loader";
 
 const GraphView = () => {
   const [graphData, setGraphData] = useState({ nodes: [], links: [] });
@@ -47,12 +48,22 @@ const GraphView = () => {
   }, [loading]);
 
   if (loading) {
-    return (
-      <div className="h-full flex items-center justify-center text-text-secondary">
-        Loading graph...
-      </div>
-    );
-  }
+        return (
+            <div style={{
+                position: "absolute",
+                inset: 0,
+                top: "50%",
+                left: "56%",
+                transform: "translate(-50%, -50%)",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                overflow: "hidden"
+            }}>
+                <Loader />
+            </div>
+        );
+    }
 
   const graphBg = theme === 'dark' ? '#121212' : '#ffffff';
   const linkColor = theme === 'dark' ? '#4a4a60' : '#d1d5db';

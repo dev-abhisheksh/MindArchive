@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { createCollection, fetchCollections, updateCollection } from '../api/collection.api';
 import { FolderOpen, MoreVertical, Layers, X, Pencil, Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import Loader from '../components/ui/Loader';
 
 const Collections = () => {
   const [collections, setCollections] = useState([]);
@@ -59,11 +60,23 @@ const Collections = () => {
     }
   }, [selectedCollection])
 
-  if (loading) return (
-    <div className="flex h-full items-center justify-center">
-      <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-600"></div>
-    </div>
-  );
+  if (loading) {
+        return (
+            <div style={{
+                position: "absolute",
+                inset: 0,
+                top: "50%",
+                left: "56%",
+                transform: "translate(-50%, -50%)",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                overflow: "hidden"
+            }}>
+                <Loader />
+            </div>
+        );
+    }
 
   return (
     <div className="max-w-6xl mx-auto p-4 md:p-6">

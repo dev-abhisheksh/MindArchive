@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { ArrowLeft, Layers, FileText, Video, ExternalLink } from 'lucide-react'
 import { fetchCollectionById } from '../api/collection.api'
+import Loader from '../components/ui/Loader'
 
 const DetailedCollection = () => {
   const { id } = useParams()
@@ -34,6 +35,24 @@ const DetailedCollection = () => {
       Collection not found.
     </div>
   )
+
+  if (loading) {
+    return (
+      <div style={{
+        position: "absolute",
+        inset: 0,
+        top: "50%",
+        left: "56%",
+        transform: "translate(-50%, -50%)",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        overflow: "hidden"
+      }}>
+        <Loader />
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-7xl mx-auto p-4 md:p-6">

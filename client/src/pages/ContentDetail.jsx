@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { contentById } from "../api/content.api";
 import Button from "../components/Button";
 import { fetchRelatedContents } from "../api/relatedContent.api";
+import Loader from "../components/ui/Loader";
 
 const ContentDetail = () => {
     const [content, setContent] = useState(null);
@@ -50,6 +51,25 @@ const ContentDetail = () => {
     );
 
     const embedUrl = content.type === 'video' ? getYouTubeEmbedUrl(content.url) : null;
+
+    if (loading) {
+        return (
+            <div style={{
+                position: "absolute",
+                inset: 0,
+                top: "50%",
+                left: "56%",
+                transform: "translate(-50%, -50%)",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                overflow: "hidden"
+            }}>
+                <Loader />
+            </div>
+        );
+    }
+
 
     return (
         <div className="flex flex-col min-h-full w-full">
@@ -141,8 +161,8 @@ const ContentDetail = () => {
                                     >
                                         <span
                                             className={`text-[9px] uppercase font-black px-2 py-1 rounded mb-4 inline-block ${item?.to?.type === "video"
-                                                    ? "bg-red-50 text-red-600"
-                                                    : "bg-emerald-50 text-emerald-600"
+                                                ? "bg-red-50 text-red-600"
+                                                : "bg-emerald-50 text-emerald-600"
                                                 }`}
                                         >
                                             {item?.to?.type}
