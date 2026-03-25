@@ -61,22 +61,12 @@ const Collections = () => {
   }, [selectedCollection])
 
   if (loading) {
-        return (
-            <div style={{
-                position: "absolute",
-                inset: 0,
-                top: "50%",
-                left: "56%",
-                transform: "translate(-50%, -50%)",
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                overflow: "hidden"
-            }}>
-                <Loader />
-            </div>
-        );
-    }
+    return (
+      <div className="flex h-full w-full items-center justify-center">
+        <Loader />
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-6xl mx-auto p-4 md:p-6">

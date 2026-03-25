@@ -81,18 +81,8 @@ const Dashboard = () => {
 
     if (loading) {
         return (
-            <div style={{
-                position: "absolute",
-                inset: 0,
-                top: "50%",
-                left: "56%",
-                transform: "translate(-50%, -50%)",
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                overflow: "hidden"
-            }}>
-                <Loader />
+            <div className="flex h-full w-full items-center justify-center">
+                <Loader/>
             </div>
         );
     }

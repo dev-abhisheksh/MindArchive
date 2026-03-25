@@ -48,22 +48,12 @@ const GraphView = () => {
   }, [loading]);
 
   if (loading) {
-        return (
-            <div style={{
-                position: "absolute",
-                inset: 0,
-                top: "50%",
-                left: "56%",
-                transform: "translate(-50%, -50%)",
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                overflow: "hidden"
-            }}>
-                <Loader />
-            </div>
-        );
-    }
+    return (
+      <div className="flex h-full w-full items-center justify-center">
+        <Loader />
+      </div>
+    );
+  }
 
   const graphBg = theme === 'dark' ? '#121212' : '#ffffff';
   const linkColor = theme === 'dark' ? '#4a4a60' : '#d1d5db';

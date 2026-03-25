@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
-import { Content } from "../models/content.model";
-import { User } from "../models/user.model";
-import bcrypt from "bcrypt";
+import { Content } from "../models/content.model.js";
+import { User } from "../models/user.model.js";
+import bcrypt from "bcryptjs";
 
 const setVaultPin = async (req, res) => {
     try {

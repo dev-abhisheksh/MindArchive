@@ -47,7 +47,7 @@ const addContent = async (req, res) => {
 
 const getMyContent = async (req, res) => {
     try {
-        const myContent = await Content.find({ userId: req.user._id })
+        const myContent = await Content.find({ userId: req.user._id, isPrivate: false })
             .select("-__v -embedding")
             .sort({ createdAt: -1 });
 
