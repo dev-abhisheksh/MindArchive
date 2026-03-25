@@ -8,12 +8,14 @@ const router = express.Router();
 router.post("/create", verifyToken, addContent)
 router.get("/my-content", verifyToken, getMyContent)
 router.get("/grouped-content", verifyToken, getContentsByTag)
-router.get("/:contentId", verifyToken, contentById)
+
 
 // PRIVATE VAULT ROUTES
 
 router.post("/vault/set-pin", verifyToken, setVaultPin)
 router.post("/vault/verify-pin", verifyToken, verifyVaultPin)
 router.post("/vault/toggle/:contentId", verifyToken, addToPrivateVault)
+
+router.get("/:contentId", verifyToken, contentById)
 
 export default router;

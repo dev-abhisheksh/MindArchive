@@ -9,6 +9,8 @@ import Layout from './layout/Layout'
 import ContentDetail from './pages/ContentDetail'
 import ProtectedRoute from './route/ProtectedRoute'
 import DetailedCollection from './pages/DetailedCollection'
+import PrivateVault from './pages/PrivateVault'
+import VerifyPin from './pages/VerifyPin'
 
 const App = () => {
   return (
@@ -23,6 +25,8 @@ const App = () => {
           <Route path="/collections" element={<Collections />} />
           <Route path="/collections/:id" element={<DetailedCollection />} />
           <Route path="/content/:id" element={<ContentDetail />} />
+          <Route path="/vault" element={< PrivateVault/>} />
+          <Route path="/verify-pin" element={< VerifyPin/>} />
         </Route>
       </Routes>
     </div>

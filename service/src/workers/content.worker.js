@@ -16,10 +16,10 @@ import { summarizeText } from "../services/textSummary.service.js";
 const app = express();
 app.get("/", (req, res) => res.send("Worker running"));
 
-const PORT = process.env.PORT || 5000;
+const PORT2 = process.env.PORT2;
 
-app.listen(PORT, () => {
-    console.log("Dummy server running on", PORT);
+app.listen(PORT2, () => {
+    console.log("Dummy server running on", PORT2);
 });
 
 await connectDB();

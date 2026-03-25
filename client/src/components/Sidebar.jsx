@@ -25,6 +25,10 @@ export default function Sidebar() {
                     Collections
                 </NavLink>
 
+                <NavLink to="/verify-pin" className={navLinkStyles}>
+                    Private Vault
+                </NavLink>
+
             </nav>
         </aside>
     ); 
