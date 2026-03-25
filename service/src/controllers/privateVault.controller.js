@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import { Content } from "../models/content.model";
 import { User } from "../models/user.model";
 import bcrypt from "bcrypt";
@@ -42,7 +43,37 @@ const verifyVaultPin = async (req, res) => {
     }
 }
 
+const addToPrivateVault = async (req, res) => {
+    try {
+        const userId = req.user._id;
+        const { contentId } = req.params;
+        if (!mongoose.Types.ObjectId.isValid(contentId)) {
+            return res.status(400).json({ message: "Invalid contentId" })
+        }
+
+        const content = await Content.findById(contentId);
+        if (!content) {
+            return res.status(404).json({ message: "Content not found" })
+        }
+
+        if (content.userId.toString() !== userId.toString()) {
+            return res.status(403).json({ message: "You don't have permission to add this content to private vault" })
+        }
+
+        content.isPrivate = !content.isPrivate;
+        await content.save();
+
+        return res.status(200).json({
+            message: content.isPrivate ? "Content added to private vault" : "Content removed from private vault"
+        })
+    } catch (error) {
+        console.error("Error adding/removing content from private vault:", error);
+        return res.status(500).json({ message: "Internal server error" });
+    }
+}
+
 export {
     setVaultPin,
-    verifyVaultPin
+    verifyVaultPin,
+    addToPrivateVault
 }
