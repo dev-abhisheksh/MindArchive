@@ -39,6 +39,11 @@ const contentSchema = new mongoose.Schema({
         default: "pending"
     },
 
+    isPrivate: {
+        type: Boolean,
+        default: false
+    },
+
     createdAt: {
         type: Date,
         default: Date.now
@@ -47,5 +52,6 @@ const contentSchema = new mongoose.Schema({
 
 contentSchema.index({ userId: 1 });
 contentSchema.index({ tags: 1 });
+contentSchema.index({isPrivate: 1 });
 
 export const Content = mongoose.model("Content", contentSchema)

@@ -19,7 +19,12 @@ const userSchema = new mongoose.Schema({
 
     avatar: {
         type: String
+    },
+
+    vaultPinHash: {
+        type: String
     }
+
 }, { timestamps: true });
 
 export const User = mongoose.model("User", userSchema);
