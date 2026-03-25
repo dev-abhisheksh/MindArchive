@@ -9,6 +9,7 @@ const contentSchema = new mongoose.Schema({
 
     type: {
         type: String,
+        enum: ["article", "video", "tweet", "document", "image"],
         required: true
     },
 
@@ -16,7 +17,10 @@ const contentSchema = new mongoose.Schema({
 
     url: String,
 
-    text: String,
+    text: {
+        type: String,
+        default: ""
+    },
 
     tags: [String],
 
@@ -52,6 +56,6 @@ const contentSchema = new mongoose.Schema({
 
 contentSchema.index({ userId: 1 });
 contentSchema.index({ tags: 1 });
-contentSchema.index({isPrivate: 1 });
+contentSchema.index({ isPrivate: 1 });
 
 export const Content = mongoose.model("Content", contentSchema)

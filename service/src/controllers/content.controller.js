@@ -1,3 +1,4 @@
+import { text } from "express";
 import { Content } from "../models/content.model.js";
 import { contentQueue } from "../queues/content.queue.js";
 import { generateTagsWithAI } from "../services/tagGeneration.service.js";
@@ -7,23 +8,26 @@ import { getTimeAgo } from "../utils/resurface.util.js";
 const addContent = async (req, res) => {
     try {
         const userId = req.user._id;
-        let { type, title, url, text } = req.body;
+        let { type, title, url } = req.body;
 
-        if (!type || !title || !url || !text) {
-            return res.status(400).json({ message: "Title, Type, Url and text are required" })
+        if (!type || !title || !url) {
+            return res.status(400).json({ message: "Title, Type and Url are required" })
         }
-
 
         const normalized = {}
         normalized.type = type?.toLowerCase().trim();
         normalized.title = title?.trim();
         normalized.url = url?.trim();
-        normalized.text = text?.trim();
+        normalized.text = text?.trim() || "";
 
         const existing = await Content.findOne({
             userId,
             url: normalized.url
         });
+
+        if (existing) {
+            return res.status(200).json({ message: "Already saved", content: existing });
+        }
 
         const content = await Content.create({
             userId,
