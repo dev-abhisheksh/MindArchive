@@ -1,15 +1,14 @@
 import React, { useEffect, useState, useRef } from "react";
 import {
-    Search, LogOut, BrainCircuit, Menu, X,
+    Search, LogOut, BrainCircuit, X,
     LayoutDashboard, Share2, Library, FileText, Loader2,
     Sun, Moon, Lock
 } from "lucide-react";
-import { Link, NavLink, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { semanticSearch } from "../api/search.api";
 import { useTheme } from "../hooks/useTheme";
 
 export default function Navbar() {
-    const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
     const [query, setQuery] = useState("");
     const [debouncedQuery, setDebouncedQuery] = useState("");
@@ -38,12 +37,12 @@ export default function Navbar() {
     }, []);
 
     useEffect(() => {
-        if ((searchData && query) || isMobileSearchOpen || isMenuOpen) {
+        if ((searchData && query) || isMobileSearchOpen) {
             document.body.style.overflow = 'hidden';
         } else {
             document.body.style.overflow = 'unset';
         }
-    }, [searchData, query, isMobileSearchOpen, isMenuOpen]);
+    }, [searchData, query, isMobileSearchOpen]);
 
     useEffect(() => {
         const timer = setTimeout(() => setDebouncedQuery(query), 400);
@@ -68,12 +67,6 @@ export default function Navbar() {
         };
         searchContent();
     }, [debouncedQuery]);
-
-    const navLinks = [
-        { to: "/", label: "Dashboard", icon: <LayoutDashboard size={18} /> },
-        { to: "/graph", label: "Graph", icon: <Share2 size={18} /> },
-        { to: "/collections", label: "Collections", icon: <Library size={18} /> },
-    ];
 
     const SearchResults = () => (
         <div className="absolute top-full left-0 mt-5 w-full bg-bg-card border border-border-theme rounded-xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200 z-[100]">
@@ -135,48 +128,17 @@ export default function Navbar() {
     return (
         <>
             {/* BACKDROP */}
-            {((searchData && query) || isMobileSearchOpen || isMenuOpen) && (
+            {((searchData && query) || isMobileSearchOpen) && (
                 <div
                     className="fixed inset-0 z-[40] bg-backdrop backdrop-blur-md transition-all duration-500"
                     style={{ marginTop: '64px' }}
                     onClick={() => {
                         setSearchData(null);
                         setIsMobileSearchOpen(false);
-                        setIsMenuOpen(false);
                         setQuery("");
                     }}
                 />
             )}
-
-            {/* MOBILE SIDE MENU */}
-            <div className={`fixed top-16 left-0 h-[calc(100vh-64px)] w-64 bg-bg-primary z-[60] shadow-xl transform transition-transform duration-300 md:hidden ${isMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
-                <nav className="flex flex-col p-4 gap-1">
-                    {navLinks.map(({ to, label, icon }) => (
-                        <NavLink
-                            key={to}
-                            to={to}
-                            onClick={() => setIsMenuOpen(false)}
-                            className={({ isActive }) =>
-                                `flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all ${isActive
-                                    ? 'bg-accent-primary text-white'
-                                    : 'text-text-secondary hover:bg-bg-hover'
-                                }`
-                            }
-                        >
-                            {icon}
-                            {label}
-                        </NavLink>
-                    ))}
-                    {/* Logout in Mobile Menu */}
-                    <button
-                        onClick={handleLogout}
-                        className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-red-500 hover:bg-red-500/10 transition-all mt-4"
-                    >
-                        <LogOut size={18} />
-                        Logout
-                    </button>
-                </nav>
-            </div>
 
             {/* MOBILE SEARCH BAR */}
             <div className={`fixed inset-x-0 top-0 h-16 bg-bg-primary z-[70] px-4 flex items-center transition-transform duration-300 md:hidden border-b border-border-theme ${isMobileSearchOpen ? 'translate-y-0' : '-translate-y-full'}`}>
@@ -198,15 +160,9 @@ export default function Navbar() {
             <nav className="h-16 w-full bg-bg-primary border-b border-border-theme flex items-center justify-between px-4 md:px-8 sticky top-0 z-[50]">
                 {/* Logo */}
                 <div className="flex items-center gap-3">
-                    <button
-                        className="md:hidden p-2 hover:bg-bg-hover rounded-lg text-text-primary"
-                        onClick={() => setIsMenuOpen(!isMenuOpen)}
-                    >
-                        {isMenuOpen ? <X size={20} /> : <Menu size={20} />}
-                    </button>
                     <Link to="/" className="flex items-center gap-2">
                         <div className="p-2 rounded-lg bg-accent-primary text-white"><BrainCircuit size={18} /></div>
-                        <span className="text-lg font-bold hidden sm:block text-text-primary">MindArchive</span>
+                        <span className="text-lg font-bold text-text-primary">MindArchive</span>
                     </Link>
                 </div>
 
@@ -243,7 +199,7 @@ export default function Navbar() {
                     {/* Logout Button */}
                     <button
                         onClick={handleLogout}
-                        className="p-2 text-text-muted hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                        className="hidden sm:block p-2 text-text-muted hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                         title="Logout"
                     >
                         <LogOut size={20} />

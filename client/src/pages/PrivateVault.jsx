@@ -56,9 +56,18 @@ const PrivateVault = () => {
         }
 
         const rect = e.currentTarget.getBoundingClientRect();
+        const menuWidth = 224;
+        let leftPos = rect.right + window.scrollX - menuWidth;
+        
+        // Prevent overflowing viewport bounds
+        if (leftPos < 16) leftPos = 16;
+        if (leftPos + menuWidth > window.innerWidth - 16) {
+            leftPos = window.innerWidth - menuWidth - 16;
+        }
+
         setMenuPos({
             top: rect.bottom + window.scrollY + 8,
-            left: rect.right + window.scrollX - 224,
+            left: leftPos,
         });
         setActiveMenu(contentId);
 
@@ -293,9 +302,9 @@ const PrivateVault = () => {
 
             {/* PIN Verification Modal */}
             {pinModal.open && createPortal(
-                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm" onClick={closePinModal}>
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm" onClick={closePinModal}>
                     <div
-                        className="bg-bg-card border border-border-theme rounded-2xl shadow-2xl p-6 w-80 text-center animate-in fade-in zoom-in-95"
+                        className="bg-bg-card border border-border-theme rounded-2xl shadow-2xl p-6 w-[90%] max-w-[320px] text-center animate-in fade-in zoom-in-95"
                         onClick={(e) => e.stopPropagation()}
                     >
                         <div className="flex justify-between items-center mb-4">

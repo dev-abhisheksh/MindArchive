@@ -221,3 +221,47 @@
   color: var(--text-muted);
   pointer-events: none;
 }
+
+/* ===== Responsive adjustments ===== */
+@media (max-width: 640px) {
+  .graph-search input {
+    width: 140px;
+    font-size: 12px;
+  }
+  .graph-search input:focus {
+    width: 200px;
+  }
+  .graph-stats {
+    flex-direction: column;
+    gap: 6px;
+    top: 12px;
+    right: 12px;
+  }
+  .graph-stat-badge {
+    padding: 4px 10px;
+    font-size: 10px;
+  }
+  .graph-search {
+    top: 12px;
+    left: 12px;
+  }
+  .graph-controls {
+    bottom: 16px;
+    left: 12px;
+    gap: 8px;
+    flex-direction: row;
+  }
+  .graph-legend {
+    bottom: 60px;
+    right: 12px;
+    padding: 8px 10px;
+    max-height: 150px;
+  }
+  .graph-legend-title {
+    font-size: 9px;
+  }
+  .graph-legend-item {
+    font-size: 10px;
+  }
+}
+

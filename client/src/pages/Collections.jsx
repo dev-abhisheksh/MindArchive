@@ -70,12 +70,12 @@ const Collections = () => {
 
   return (
     <div className="max-w-6xl mx-auto p-4 md:p-6">
-      <header className="mb-10">
-        <h1 className="text-3xl font-bold text-text-primary">Your Collections</h1>
-        <p className="text-text-muted mt-1">Organized groups of your saved knowledge.</p>
+      <header className="mb-6 md:mb-10">
+        <h1 className="text-2xl md:text-3xl font-bold text-text-primary">Your Collections</h1>
+        <p className="text-text-muted mt-1 text-sm md:text-base">Organized groups of your saved knowledge.</p>
       </header>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 relative">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 lg:gap-8 relative">
         {collections.map((collection) => (
           <div key={collection._id}
             onClick={() => navigate(`/collections/${collection._id}`)}

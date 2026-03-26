@@ -58,13 +58,13 @@ const DetailedCollection = () => {
       </button>
 
       {/* Header */}
-      <div className="bg-bg-card border border-border-theme rounded-2xl p-6 shadow-sm mb-6">
-        <div className="flex items-center gap-4">
-          <div className="p-3 bg-accent-light text-accent-text rounded-xl">
+      <div className="bg-bg-card border border-border-theme rounded-2xl p-4 md:p-6 shadow-sm mb-6">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+          <div className="p-3 bg-accent-light text-accent-text rounded-xl w-fit">
             <Layers size={24} />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-text-primary">{collection.name}</h1>
+            <h1 className="text-xl md:text-2xl font-bold text-text-primary">{collection.name}</h1>
             <p className="text-text-muted text-sm mt-0.5">{collection.description || 'No description provided.'}</p>
           </div>
         </div>
@@ -85,9 +85,9 @@ const DetailedCollection = () => {
           <div
             key={item._id}
             onClick={() => navigate(`/content/${item._id}`)}
-            className="group bg-bg-card border border-border-theme rounded-2xl p-4 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all cursor-pointer flex items-center justify-between gap-4"
+            className="group bg-bg-card border border-border-theme rounded-2xl p-3 md:p-4 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all cursor-pointer flex items-center justify-between gap-3 md:gap-4 flex-wrap sm:flex-nowrap"
           >
-            <div className="flex items-center gap-4 min-w-0">
+            <div className="flex items-center gap-3 md:gap-4 min-w-0 w-full sm:w-auto">
               <div className={`p-2 rounded-lg shrink-0 ${item.type === 'video' ? 'bg-red-50 text-red-500' : 'bg-emerald-50 text-emerald-600'}`}>
                 {item.type === 'video' ? <Video size={16} /> : <FileText size={16} />}
               </div>
