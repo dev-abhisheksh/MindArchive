@@ -80,8 +80,25 @@ const addToPrivateVault = async (req, res) => {
     }
 }
 
+const fetchPrivateVaultContents = async (req, res) => {
+    try {
+        const userId = req.user._id;
+
+        const privateContents = await Content.find({ userId, isPrivate: true });
+
+        return res.status(200).json({
+            contents: privateContents,
+            count: privateContents.length
+        })
+    } catch (error) {
+        console.error("Error fetching private vault contents:", error.message);
+        return res.status(500).json({ message: "Internal server error" });
+    }
+}
+
 export {
     setVaultPin,
     verifyVaultPin,
-    addToPrivateVault
+    addToPrivateVault,
+    fetchPrivateVaultContents
 }

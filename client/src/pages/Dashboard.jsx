@@ -4,6 +4,8 @@ import { fetchContent } from '../api/content.api';
 import { useNavigate } from 'react-router-dom';
 import { MoreVertical, FolderPlus, Loader2 } from 'lucide-react';
 import { addContentsToCollection, fetchCollections } from '../api/collection.api';
+import { MdOutlinePrivateConnectivity } from "react-icons/md";
+
 import Loader from '../components/ui/Loader';
 
 const Dashboard = () => {
@@ -82,7 +84,7 @@ const Dashboard = () => {
     if (loading) {
         return (
             <div className="flex h-full w-full items-center justify-center">
-                <Loader/>
+                <Loader />
             </div>
         );
     }
