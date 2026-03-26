@@ -1,9 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { contentById } from "../api/content.api";
+import { verifyPin } from "../api/vault.api";
 import Button from "../components/Button";
 import { fetchRelatedContents } from "../api/relatedContent.api";
 import Loader from "../components/ui/Loader";
+import { Lock, Loader2 } from "lucide-react";
 
 
 const ContentDetail = () => {
@@ -11,23 +13,45 @@ const ContentDetail = () => {
     const [relatedContent, setRelatedContent] = useState([]);
     const { id } = useParams();
     const navigate = useNavigate();
-    const [loading, setLoading] = useState(true)
+    const [loading, setLoading] = useState(true);
+
+    // PIN gate state
+    const [needsPin, setNeedsPin] = useState(false);
+    const [pinUnlocked, setPinUnlocked] = useState(false);
+    const [pin, setPin] = useState(["", "", "", ""]);
+    const [pinError, setPinError] = useState("");
+    const [pinLoading, setPinLoading] = useState(false);
+    const pinRefs = useRef([]);
 
     useEffect(() => {
         setContent(null);
         setRelatedContent([]);
         setLoading(true);
-
+        setNeedsPin(false);
+        setPinUnlocked(false);
+        setPin(["", "", "", ""]);
+        setPinError("");
 
         const fetchContentDetail = async () => {
             try {
                 const res = await contentById(id);
-                setContent(res.data.content || res.data);
-                console.log(res.data.content)
+                const data = res.data.content || res.data;
+                setContent(data);
+
+                // Check if content is private and vault not verified
+                if (data.isPrivate) {
+                    const verified = sessionStorage.getItem("vaultVerified") === "true";
+                    if (!verified) {
+                        setNeedsPin(true);
+                    } else {
+                        setPinUnlocked(true);
+                    }
+                }
             } catch (error) {
                 console.error(error);
+            } finally {
+                setLoading(false);
             }
-            finally { setLoading(false) }
         };
 
         const allRelatedContents = async () => {
@@ -36,8 +60,6 @@ const ContentDetail = () => {
                 setRelatedContent(res.data);
             } catch (error) {
                 console.error(error);
-            } finally {
-                setLoading(false)
             }
         };
 
@@ -45,28 +67,133 @@ const ContentDetail = () => {
         allRelatedContents();
     }, [id]);
 
+    // ── PIN handlers ────────────────────────────────────
+    const handlePinChange = (value, index) => {
+        if (!/^\d?$/.test(value)) return;
+        const newPin = [...pin];
+        newPin[index] = value;
+        setPin(newPin);
+        setPinError("");
+        if (value && index < 3) pinRefs.current[index + 1].focus();
+    };
+
+    const handlePinKeyDown = (e, index) => {
+        if (e.key === "Backspace" && !pin[index] && index > 0) {
+            pinRefs.current[index - 1].focus();
+        }
+    };
+
+    const handlePinPaste = (e) => {
+        e.preventDefault();
+        const pasted = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, 4);
+        if (pasted.length === 4) {
+            setPin(pasted.split(""));
+            pinRefs.current[3].focus();
+        }
+    };
+
+    const handlePinSubmit = async (e) => {
+        e.preventDefault();
+        const finalPin = pin.join("");
+        if (finalPin.length < 4) {
+            setPinError("Enter all 4 digits");
+            return;
+        }
+        setPinLoading(true);
+        try {
+            await verifyPin(finalPin);
+            sessionStorage.setItem("vaultVerified", "true");
+            setNeedsPin(false);
+            setPinUnlocked(true);
+        } catch (err) {
+            setPinError(err.response?.data?.message || "Wrong PIN");
+            setPin(["", "", "", ""]);
+            pinRefs.current[0]?.focus();
+        } finally {
+            setPinLoading(false);
+        }
+    };
+
     const getYouTubeEmbedUrl = (url) => {
-        const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+        const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
         const match = url.match(regExp);
         return (match && match[2].length === 11) ? `https://www.youtube.com/embed/${match[2]}` : null;
     };
 
-    if (!content) return (
-        <div className="flex h-full items-center justify-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
-        </div>
-    );
+    if (loading || !content) {
+        return (
+            <div className="flex h-full w-full items-center justify-center">
+                <Loader />
+            </div>
+        );
+    }
 
+    // ── PIN Gate Screen ─────────────────────────────────
+    if (needsPin && !pinUnlocked) {
+        return (
+            <div className="flex flex-col min-h-full w-full items-center justify-center">
+                <div className="bg-bg-card border border-border-theme rounded-2xl shadow-md p-8 w-80 text-center">
+                    <div className="flex justify-center mb-4">
+                        <div className="p-3 rounded-2xl bg-amber-500/10">
+                            <Lock size={28} className="text-amber-500" />
+                        </div>
+                    </div>
+
+                    <h2 className="text-xl font-bold text-text-primary mb-1">
+                        Private Content
+                    </h2>
+                    <p className="text-text-muted text-sm mb-6">
+                        This content is in your private vault. Enter your PIN to view it.
+                    </p>
+
+                    <form onSubmit={handlePinSubmit}>
+                        <div className="flex justify-center gap-3 mb-4" onPaste={handlePinPaste}>
+                            {pin.map((digit, index) => (
+                                <input
+                                    key={index}
+                                    type="password"
+                                    maxLength="1"
+                                    value={digit}
+                                    ref={(el) => (pinRefs.current[index] = el)}
+                                    onChange={(e) => handlePinChange(e.target.value, index)}
+                                    onKeyDown={(e) => handlePinKeyDown(e, index)}
+                                    disabled={pinLoading}
+                                    autoFocus={index === 0}
+                                    className="w-12 h-14 text-xl text-center font-bold border border-border-theme rounded-xl bg-bg-input text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary focus:border-accent-primary disabled:opacity-50 transition-all"
+                                />
+                            ))}
+                        </div>
+
+                        {pinError && (
+                            <p className="text-red-500 text-xs font-medium mb-3">❌ {pinError}</p>
+                        )}
+
+                        <button
+                            type="submit"
+                            disabled={pinLoading || pin.some(d => d === "")}
+                            className="w-full bg-accent-primary hover:opacity-90 text-white py-2.5 rounded-xl font-semibold text-sm transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                        >
+                            {pinLoading ? (
+                                <><Loader2 size={14} className="animate-spin" /> Verifying...</>
+                            ) : (
+                                <><Lock size={14} /> Unlock Content</>
+                            )}
+                        </button>
+                    </form>
+
+                    <button
+                        onClick={() => navigate(-1)}
+                        className="mt-4 text-text-muted hover:text-text-secondary text-xs font-medium transition-colors"
+                    >
+                        ← Go back
+                    </button>
+                </div>
+            </div>
+        );
+    }
+
+    // ── Normal Content View ─────────────────────────────
     const embedUrl = content.type === 'video' ? getYouTubeEmbedUrl(content.url) : null;
-
-    if (loading) {
-    return (
-      <div className="flex h-full w-full items-center justify-center">
-        <Loader />
-      </div>
-    );
-  }
-
 
     return (
         <div className="flex flex-col min-h-full w-full">
@@ -84,6 +211,11 @@ const ContentDetail = () => {
                         </button>
 
                         <div className="flex items-center gap-2 overflow-x-auto no-scrollbar sm:flex-wrap">
+                            {content.isPrivate && (
+                                <span className="whitespace-nowrap text-[9px] sm:text-[10px] uppercase tracking-wider font-black text-amber-500 bg-amber-500/10 px-2 sm:px-3 py-1 rounded-lg flex items-center gap-1">
+                                    <Lock size={10} /> Private
+                                </span>
+                            )}
                             {content.tags?.map(tag => (
                                 <span key={tag} className="whitespace-nowrap text-[9px] sm:text-[10px] uppercase tracking-wider font-black text-accent-text bg-accent-light px-2 sm:px-3 py-1 rounded-lg">
                                     #{tag}
@@ -158,8 +290,8 @@ const ContentDetail = () => {
                                     >
                                         <span
                                             className={`text-[9px] uppercase font-black px-2 py-1 rounded mb-4 inline-block ${item?.to?.type === "video"
-                                                ? "bg-red-50 text-red-600"
-                                                : "bg-emerald-50 text-emerald-600"
+                                                ? "bg-red-500/10 text-red-500"
+                                                : "bg-emerald-500/10 text-emerald-500"
                                                 }`}
                                         >
                                             {item?.to?.type}

@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import {
     Search, LogOut, BrainCircuit, Menu, X,
     LayoutDashboard, Share2, Library, FileText, Loader2,
-    Sun, Moon
+    Sun, Moon, Lock
 } from "lucide-react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { semanticSearch } from "../api/search.api";
@@ -79,26 +79,52 @@ export default function Navbar() {
         <div className="absolute top-full left-0 mt-5 w-full bg-bg-card border border-border-theme rounded-xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200 z-[100]">
             <div className="max-h-[60vh] md:max-h-[400px] overflow-y-auto p-2">
                 {searchData?.results?.length > 0 ? (
-                    searchData.results.map((result) => (
-                        <Link
-                            key={result._id || result.id}
-                            to={`/content/${result._id || result.id}`}
-                            onClick={() => {
-                                setSearchData(null);
-                                setQuery("");
-                                setIsMobileSearchOpen(false);
-                            }}
-                            className="flex items-start gap-3 p-3 hover:bg-bg-hover rounded-lg transition group"
-                        >
-                            <div className="p-2 bg-bg-input border border-border-theme rounded-lg text-text-muted group-hover:text-text-primary transition-all">
-                                <FileText size={16} />
-                            </div>
-                            <div className="flex flex-col min-w-0">
-                                <span className="text-sm font-semibold text-text-primary truncate">{result.title}</span>
-                                <p className="text-xs text-text-muted line-clamp-1 italic">{result.text || "No preview..."}</p>
-                            </div>
-                        </Link>
-                    ))
+                    searchData.results.map((result) => {
+                        const isPrivate = result.isPrivate === true;
+
+                        if (isPrivate) {
+                            return (
+                                <div
+                                    key={result._id || result.id}
+                                    className="flex items-start gap-3 p-3 rounded-lg opacity-60 cursor-not-allowed select-none"
+                                >
+                                    <div className="p-2 border rounded-lg flex-none bg-amber-500/10 border-amber-500/20 text-amber-500">
+                                        <Lock size={16} />
+                                    </div>
+                                    <div className="flex flex-col min-w-0 flex-1">
+                                        <div className="flex items-center gap-2">
+                                            <span className="text-sm font-semibold text-text-primary truncate">{result.title}</span>
+                                            <span className="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-500 flex-none">
+                                                Private
+                                            </span>
+                                        </div>
+                                        <p className="text-xs text-text-muted italic">🔒 Unlock in Vault to view</p>
+                                    </div>
+                                </div>
+                            );
+                        }
+
+                        return (
+                            <Link
+                                key={result._id || result.id}
+                                to={`/content/${result._id || result.id}`}
+                                onClick={() => {
+                                    setSearchData(null);
+                                    setQuery("");
+                                    setIsMobileSearchOpen(false);
+                                }}
+                                className="flex items-start gap-3 p-3 hover:bg-bg-hover rounded-lg transition group"
+                            >
+                                <div className="p-2 bg-bg-input border border-border-theme rounded-lg text-text-muted group-hover:text-text-primary transition-all flex-none">
+                                    <FileText size={16} />
+                                </div>
+                                <div className="flex flex-col min-w-0 flex-1">
+                                    <span className="text-sm font-semibold text-text-primary truncate">{result.title}</span>
+                                    <p className="text-xs text-text-muted line-clamp-1 italic">{result.text || "No preview..."}</p>
+                                </div>
+                            </Link>
+                        );
+                    })
                 ) : (
                     <div className="p-8 text-center text-sm text-text-muted font-medium">No results for "{query}"</div>
                 )}
@@ -144,7 +170,7 @@ export default function Navbar() {
                     {/* Logout in Mobile Menu */}
                     <button
                         onClick={handleLogout}
-                        className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-red-600 hover:bg-red-50 transition-all mt-4"
+                        className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-red-500 hover:bg-red-500/10 transition-all mt-4"
                     >
                         <LogOut size={18} />
                         Logout

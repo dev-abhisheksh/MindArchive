@@ -25,6 +25,9 @@
   --backdrop-color: rgba(0, 0, 0, 0.2);
   --graph-bg: #ffffff;
   --graph-link: #d1d5db;
+  --graph-node-shadow: rgba(99, 102, 241, 0.15);
+  --graph-text: #374151;
+  --graph-controls-bg: rgba(255, 255, 255, 0.75);
 }
 
 /* Dark Theme */
@@ -50,6 +53,9 @@
   --backdrop-color: rgba(0, 0, 0, 0.55);
   --graph-bg: #141414;
   --graph-link: #4a4a4a;
+  --graph-node-shadow: rgba(129, 140, 248, 0.2);
+  --graph-text: #d1d5db;
+  --graph-controls-bg: rgba(30, 30, 30, 0.8);
 }
 
 /* Register Tailwind v4 theme tokens */

@@ -26,6 +26,7 @@ export const semanticSearch = async (req, res) => {
                     url: 1,
                     text: 1,
                     tags: 1,
+                    isPrivate: 1,
                     score: { $meta: "vectorSearchScore" }
                 }
             },

@@ -2,9 +2,9 @@ import React, { useEffect, useState, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { fetchContent } from '../api/content.api';
 import { useNavigate } from 'react-router-dom';
-import { MoreVertical, FolderPlus, Loader2 } from 'lucide-react';
+import { MoreVertical, FolderPlus, Loader2, Lock } from 'lucide-react';
 import { addContentsToCollection, fetchCollections } from '../api/collection.api';
-import { MdOutlinePrivateConnectivity } from "react-icons/md";
+import { toggleVault } from '../api/vault.api';
 
 import Loader from '../components/ui/Loader';
 
@@ -16,6 +16,7 @@ const Dashboard = () => {
     const [activeMenu, setActiveMenu] = useState(null);
     const [menuPos, setMenuPos] = useState({ top: 0, left: 0 });
     const [isAdding, setIsAdding] = useState(null);
+    const [vaultingId, setVaultingId] = useState(null);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -67,12 +68,25 @@ const Dashboard = () => {
         try {
             await addContentsToCollection(collectionId, [contentId]);
             setActiveMenu(null);
-            console.log("Added to collection");
         } catch (error) {
             console.error(error);
         } finally {
             setIsAdding(null);
-            loading && setLoading(false);
+        }
+    };
+
+    const handleMoveToVault = async (e, contentId) => {
+        e.stopPropagation();
+        e.preventDefault();
+        setVaultingId(contentId);
+        try {
+            await toggleVault(contentId);
+            setContent(prev => prev.filter(item => item._id !== contentId));
+            setActiveMenu(null);
+        } catch (error) {
+            console.error("Error moving to vault:", error);
+        } finally {
+            setVaultingId(null);
         }
     };
 
@@ -125,7 +139,7 @@ const Dashboard = () => {
                         className="group bg-bg-card rounded-2xl border border-border-theme p-5 shadow-sm hover:shadow-md transition-all cursor-pointer active:scale-[0.98] md:hover:-translate-y-1 relative"
                     >
                         <div className="flex items-center justify-between mb-4">
-                            <span className={`text-[10px] uppercase tracking-widest font-bold px-2.5 py-1 rounded-md ${item.type === 'video' ? 'bg-red-50 text-red-600' : 'bg-emerald-50 text-emerald-600'}`}>
+                            <span className={`text-[10px] uppercase tracking-widest font-bold px-2.5 py-1 rounded-md ${item.type === 'video' ? 'bg-red-500/10 text-red-500' : 'bg-emerald-500/10 text-emerald-500'}`}>
                                 {item.type}
                             </span>
 
@@ -178,6 +192,20 @@ const Dashboard = () => {
                         onClick={(e) => e.stopPropagation()}
                         className="absolute z-50 w-56 bg-bg-card border border-border-theme rounded-xl shadow-xl overflow-hidden py-2 animate-in fade-in slide-in-from-top-2"
                     >
+                        {/* Move to vault */}
+                        <button
+                            type="button"
+                            onClick={(e) => handleMoveToVault(e, activeMenu)}
+                            className="w-full text-left px-4 py-2.5 text-sm text-amber-500 hover:bg-amber-500/10 transition-colors flex items-center gap-2 border-b border-border-light"
+                        >
+                            {vaultingId === activeMenu ? (
+                                <Loader2 size={14} className="animate-spin" />
+                            ) : (
+                                <Lock size={14} />
+                            )}
+                            Move to Vault
+                        </button>
+
                         <div className="px-4 py-2 text-[10px] font-bold text-text-muted uppercase border-b border-border-light flex items-center gap-2">
                             <FolderPlus size={12} /> Add to collection
                         </div>
