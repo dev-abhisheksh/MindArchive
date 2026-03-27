@@ -33,7 +33,18 @@ const Collections = () => {
     if (!name.trim()) return;
     try {
       const res = await createCollection({ name, description });
-      setCollections(prev => [...prev, res.data.collection || res.data]);
+
+      const data = res.data.collection || res.data
+
+      const newCollection = {
+        _id: data._id,
+        name: data.name ?? name,
+        description: data.description ?? description,
+        previewContents: []
+      }
+
+      setCollections(prev => [...prev, newCollection])
+
       setName('');
       setDescription('');
       setCreateCollectionModalOpen(false);

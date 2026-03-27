@@ -178,15 +178,12 @@ const Dashboard = () => {
                 ))}
             </div>
 
-            {/* Dropdown rendered via portal */}
             {activeMenu && createPortal(
                 <>
-                    {/* Backdrop */}
                     <div
                         className="fixed inset-0 z-40"
                         onClick={() => setActiveMenu(null)}
                     />
-                    {/* Menu */}
                     <div
                         style={{ top: menuPos.top, left: menuPos.left }}
                         onClick={(e) => e.stopPropagation()}
