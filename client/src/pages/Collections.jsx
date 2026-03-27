@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { createCollection, fetchCollections, updateCollection } from '../api/collection.api';
+import { createCollection, fetchCollections, hardDeleteCollection, updateCollection } from '../api/collection.api';
 import { FolderOpen, MoreVertical, Layers, X, Pencil, Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import Loader from '../components/ui/Loader';
@@ -70,6 +70,17 @@ const Collections = () => {
       setDescription(selectedCollection.description)
     }
   }, [selectedCollection])
+
+  const deleteCollection = async (id) => {
+    try {
+      await hardDeleteCollection(id)
+      setCollections(prev => prev.filter(col => col._id !== id))
+      setSelectedCollection(null)
+      setOpenOptionModal(null)
+    } catch (error) {
+      console.error(error)
+    }
+  }
 
   if (loading) {
     return (
@@ -151,7 +162,7 @@ const Collections = () => {
                         <Pencil size={13} /> Edit
                       </button>
                       <button
-                        onClick={(e) => { e.stopPropagation() }}
+                        onClick={(e) => { e.stopPropagation(), deleteCollection(collection._id) }}
                         className="w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-red-50 transition-colors flex items-center gap-2"
                       >
                         <Trash2 size={13} /> Delete
@@ -167,7 +178,7 @@ const Collections = () => {
                       <div className="flex justify-between items-center mb-6">
                         <h2 className="text-xl font-bold text-text-primary">Edit Collection</h2>
                         <button
-                          onClick={() => setIsUpdateModalOpen(false)}
+                          onClick={(e) => { setIsUpdateModalOpen(false) }}
                           className="p-1 hover:bg-bg-hover rounded-lg transition-colors"
                         >
                           <X size={20} className="text-text-muted" />
@@ -179,6 +190,7 @@ const Collections = () => {
                           <label className="block text-xs font-bold text-text-muted uppercase tracking-wider mb-1">Name</label>
                           <input
                             value={name}
+                            onClick={(e) => e.stopPropagation()}
                             onChange={(e) => setName(e.target.value)}
                             className="w-full px-4 py-3 bg-bg-input border border-border-theme rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 transition-all text-text-primary"
                           />
@@ -187,6 +199,7 @@ const Collections = () => {
                           <label className="block text-xs font-bold text-text-muted uppercase tracking-wider mb-1">Description</label>
                           <textarea
                             value={description}
+                            onClick={(e) => e.stopPropagation()}
                             onChange={(e) => setDescription(e.target.value)}
                             className="w-full px-4 py-3 bg-bg-input border border-border-theme rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 transition-all resize-none text-text-primary"
                             rows={3}

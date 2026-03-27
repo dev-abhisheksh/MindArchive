@@ -16,7 +16,8 @@ const createCollection = async (req, res) => {
         })
 
         return res.status(201).json({
-            message: `Collection: ${collection.name} is created successfully`
+            message: `Collection: ${collection.name} is created successfully`,
+            collection
         })
     } catch (error) {
         console.error(error)
@@ -26,42 +27,10 @@ const createCollection = async (req, res) => {
 
 const getMyCollections = async (req, res) => {
     try {
-        const collections = await Collection.aggregate([
-            {
-                $match: {
-                    userId: req.user._id,
-                    isDeleted: false
-                }
-            },
-            {
-                $lookup: {
-                    from: "contents",
-                    localField: "_id",
-                    foreignField: "collectionId",
-                    as: "contents"
-                }
-            },
-            {
-                $addFields: {
-                    previewContents: { $slice: ["$contents", 3] }
-                }
-            },
-            {
-                $project: {
-                    name: 1,
-                    description: 1,
-                    createdAt: 1,
-                    previewContents: {
-                        _id: 1,
-                        title: 1,
-                        type: 1
-                    }
-                }
-            },
-            {
-                $sort: { createdAt: -1 }
-            }
-        ]);
+        const collections = await Collection.find({
+            userId: req.user._id,
+            isDeleted: false
+        }).sort({ createdAt: -1 })
 
         return res.status(200).json({
             message: "Fetched your collections",
@@ -190,10 +159,50 @@ const addContentsToCollection = async (req, res) => {
     }
 }
 
+const hardDeleteCollection = async (req, res) => {
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    try {
+        const { collectionId } = req.params;
+        if (!mongoose.Types.ObjectId.isValid(collectionId)) {
+            return res.status(400).json({ message: "Invalid collection ID" });
+        }
+
+        const userId = req.user._id;
+
+        await Content.deleteMany(
+            { collectionId, userId },
+            { session }
+        )
+
+        const deletedCollection = await Collection.findByIdAndDelete(
+            { _id: collectionId, userId },
+            { session }
+        )
+
+        if (!deletedCollection) {
+            await session.abortTransaction();
+            return res.status(404).json({ message: "Collection not found" })
+        }
+
+        await session.commitTransaction();
+        return res.status(200).json({ message: "Collection deleted successfully" })
+
+    } catch (error) {
+        await session.abortTransaction();
+        console.error(error)
+        return res.status(500).json({ message: "Failed to delete collection" })
+    } finally {
+        await session.endSession();
+    }
+}
+
 export {
     createCollection,
     getMyCollections,
     updateCollection,
     addContentsToCollection,
-    getCollectionById
+    getCollectionById,
+    hardDeleteCollection
 }

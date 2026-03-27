@@ -7,3 +7,5 @@ export const addContentsToCollection = (collectionId, contentIds) => API.patch(`
 export const createCollection = (data) => API.post(`/api/collection`, data)
 
 export const updateCollection = (collectionId, data) => API.patch(`/api/collection/${collectionId}`, data)
+
+export const hardDeleteCollection = (collectionId) => API.delete(`/api/collection/delete/${collectionId}`)

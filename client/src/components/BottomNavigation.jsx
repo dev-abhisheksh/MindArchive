@@ -7,7 +7,7 @@ export default function BottomNavigation() {
     const navItems = [
         { path: '/', label: 'Home', icon: Home },
         { path: '/collections', label: 'Collections', icon: Library },
-        { path: '/graph', label: 'Explore', icon: Share2 },
+        { path: '/graph', label: 'Graph', icon: Share2 },
         { path: '/verify-pin', label: 'Vault', icon: Lock }
     ];
 
@@ -16,7 +16,7 @@ export default function BottomNavigation() {
             <nav className="flex items-end justify-around h-16 px-2">
                 {navItems.map((item, index) => {
                     const Icon = item.icon;
-                    
+
                     return (
                         <NavLink
                             key={index}
