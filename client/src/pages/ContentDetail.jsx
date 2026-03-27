@@ -196,7 +196,7 @@ const ContentDetail = () => {
     const embedUrl = content.type === 'video' ? getYouTubeEmbedUrl(content.url) : null;
 
     return (
-        <div className="flex flex-col min-h-full w-full">
+        <div className="flex flex-col min-h-full w-full p-4">
             <div className="w-full md:p-8 max-w-7xl mx-auto">
 
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 w-full mb-8">
