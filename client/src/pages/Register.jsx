@@ -16,7 +16,7 @@ const Register = () => {
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
-    if (error) setError(""); // Clear error when user types
+    if (error) setError("");
   };
 
   const handleRegister = async (e) => {
