@@ -10,8 +10,21 @@ export const webSearchController = async (req, res) => {
 
         const data = await webSearch(query)
 
+        const maxPerDomain = 2;
+        const domainCount = {};
+
         const results = data.organic
-            // ?.filter(item => !item.link.includes("youtube.com"))
+            ?.filter(item => {
+                try {
+                    const domain = new URL(item.link).hostname;
+
+                    domainCount[domain] = (domainCount[domain] || 0) + 1;
+
+                    return domainCount[domain] <= maxPerDomain;
+                } catch {
+                    return false;
+                }
+            })
             .slice(0, 6)
             .map(item => ({
                 title: item.title,
