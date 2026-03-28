@@ -11,8 +11,8 @@ export const webSearchController = async (req, res) => {
         const data = await webSearch(query)
 
         const results = data.organic
-            ?.filter(item => !item.link.includes("youtube.com"))
-            .slice(0, 5)
+            // ?.filter(item => !item.link.includes("youtube.com"))
+            .slice(0, 6)
             .map(item => ({
                 title: item.title,
                 link: item.link,
