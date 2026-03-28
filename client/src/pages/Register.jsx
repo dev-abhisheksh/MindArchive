@@ -29,7 +29,7 @@ const Register = () => {
     setLoading(true);
     try {
       await register(formData);
-      navigate("/login"); // Redirect to login after successful registration
+      navigate("/verify-otp", { state: { email: formData.email } }); // Redirect to OTP verification
     } catch (err) {
       setError(err.response?.data?.message || "Registration failed. Try again.");
     } finally {

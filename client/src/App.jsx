@@ -11,6 +11,7 @@ import ProtectedRoute from './route/ProtectedRoute'
 import DetailedCollection from './pages/DetailedCollection'
 import PrivateVault from './pages/PrivateVault'
 import VerifyPin from './pages/VerifyPin'
+import VerifyOTP from './pages/VerifyOTP'
 
 const App = () => {
   return (
@@ -18,6 +19,7 @@ const App = () => {
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/verify-otp" element={<VerifyOTP />} />
 
         <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
           <Route path="/" element={<Dashboard />} />

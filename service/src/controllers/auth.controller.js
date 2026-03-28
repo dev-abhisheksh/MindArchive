@@ -60,7 +60,7 @@ const verifyOTP = async (req, res) => {
         if (!data) return res.status(400).json({ message: "OTP Expired or not found" })
 
         const parsed = JSON.parse(data)
-        if (parsed.otp !== opt) return res.status(400).json({ message: "Invalid otp" })
+        if (parsed.otp !== otp) return res.status(400).json({ message: "Invalid otp" })
 
         await User.create({
             name: parsed.name,

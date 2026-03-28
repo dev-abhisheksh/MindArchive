@@ -30,7 +30,7 @@ const getOtpTemplate = (otp) => `
 const sendEmail = async ({ to, subject, htmlContent, textContent }) => {
   return await brevo.transactionalEmails.sendTransacEmail({
     to: [{ email: to }],
-    sender: { email: "your_verified_email@example.com", name: "MindArchive" },
+    sender: { email: "projectmindarchive@gmail.com", name: "MindArchive" },
     subject,
     htmlContent,
     textContent,
