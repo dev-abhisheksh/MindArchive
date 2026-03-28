@@ -10,11 +10,14 @@ export const webSearchController = async (req, res) => {
 
         const data = await webSearch(query)
 
-        const results = data.organic?.map(item => ({
-            title: item.title,
-            link: item.link,
-            snippet: item.snippet,
-        })) || [];
+        const results = data.organic
+            ?.filter(item => !item.link.includes("youtube.com"))
+            .slice(0, 5)
+            .map(item => ({
+                title: item.title,
+                link: item.link,
+                snippet: item.snippet,
+            }));
 
         return res.status(200).json({ message: "Search results fetched successfully", results })
     } catch (error) {

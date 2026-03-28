@@ -4,6 +4,6 @@ import { webSearchController } from "../controllers/webSearch.controller.js";
 
 const router = express.Router();
 
-router.get("/web-search", verifyToken, webSearchController)
+router.post("/web-search", verifyToken, webSearchController)
 
 export default router;

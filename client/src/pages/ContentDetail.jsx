@@ -6,6 +6,7 @@ import Button from "../components/Button";
 import { fetchRelatedContents } from "../api/relatedContent.api";
 import Loader from "../components/ui/Loader";
 import { Lock, Loader2 } from "lucide-react";
+import { webSearch } from "../api/web.api";
 
 
 const ContentDetail = () => {
@@ -14,13 +15,12 @@ const ContentDetail = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
-
-    // PIN gate state
     const [needsPin, setNeedsPin] = useState(false);
     const [pinUnlocked, setPinUnlocked] = useState(false);
     const [pin, setPin] = useState(["", "", "", ""]);
     const [pinError, setPinError] = useState("");
     const [pinLoading, setPinLoading] = useState(false);
+    const [results, setResults] = useState([]);
     const pinRefs = useRef([]);
 
     useEffect(() => {
@@ -67,7 +67,20 @@ const ContentDetail = () => {
         allRelatedContents();
     }, [id]);
 
-    // ── PIN handlers ────────────────────────────────────
+    const handleWebSearch = async () => {
+        try {
+            setLoading(true);
+            const query = `${content.title} ${content.text?.slice(0, 80)}`;
+            const res = await webSearch(query);
+            console.log(res.data.results);
+            setResults(res.data.results);
+        } catch (error) {
+            console.error("Web search failed:", error);
+        } finally {
+            setLoading(false);
+        }
+    }
+
     const handlePinChange = (value, index) => {
         if (!/^\d?$/.test(value)) return;
         const newPin = [...pin];
@@ -128,7 +141,7 @@ const ContentDetail = () => {
         );
     }
 
-    // ── PIN Gate Screen ─────────────────────────────────
+
     if (needsPin && !pinUnlocked) {
         return (
             <div className="flex flex-col min-h-full w-full items-center justify-center">
@@ -272,6 +285,13 @@ const ContentDetail = () => {
                                 <button className="text-text-muted hover:text-red-500 text-[10px] font-bold uppercase tracking-widest transition-colors">Delete</button>
                                 <button className="text-text-muted hover:text-indigo-600 text-[10px] font-bold uppercase tracking-widest transition-colors">Edit</button>
                             </div>
+
+                            <button
+                                className="text-text-muted hover:text-green-500 text-[10px] font-bold uppercase tracking-widest transition-colors"
+                                onClick={handleWebSearch}
+                            >
+                                Web Search
+                            </button>
                         </footer>
                     </div>
                 </div>
@@ -317,6 +337,45 @@ const ContentDetail = () => {
                         </div>
                     </div>
                 )}
+
+                {results.length > 0 && (
+                    <div className="mt-16">
+                        <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-text-muted mb-8 px-2">
+                            Web Discoveries
+                        </h3>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {results.map((item, i) => (
+                                <div
+                                    key={i}
+                                    onClick={() => window.open(item.link, "_blank")}
+                                    className="group bg-bg-card rounded-2xl border border-border-theme p-6 hover:shadow-xl transition-all cursor-pointer"
+                                >
+                                    {/* Type badge */}
+                                    <span className="text-[9px] uppercase font-black px-2 py-1 rounded mb-4 inline-block bg-blue-500/10 text-blue-500">
+                                        Web
+                                    </span>
+
+                                    {/* Title */}
+                                    <h4 className="font-bold text-text-primary group-hover:text-indigo-600 line-clamp-2 mb-2">
+                                        {item.title}
+                                    </h4>
+
+                                    {/* Snippet */}
+                                    <p className="text-text-muted text-xs line-clamp-3">
+                                        {item.snippet}
+                                    </p>
+
+                                    {/* Footer (optional domain) */}
+                                    <p className="mt-3 text-[10px] text-text-muted truncate">
+                                        {new URL(item.link).hostname}
+                                    </p>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
             </div>
         </div>
     );
