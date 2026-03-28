@@ -31,7 +31,7 @@ export const semanticSearch = async (req, res) => {
                 }
             },
             {
-                $match: { score: { $gte: 0.78 } }
+                $match: { score: { $gte: 0.7 } }
             }
         ]);
 

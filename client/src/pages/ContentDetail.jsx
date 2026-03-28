@@ -7,7 +7,7 @@ import { fetchRelatedContents } from "../api/relatedContent.api";
 import Loader from "../components/ui/Loader";
 import { Lock, Loader2 } from "lucide-react";
 import { webSearch } from "../api/web.api";
-
+import { IoSearch } from "react-icons/io5";
 
 const ContentDetail = () => {
     const [content, setContent] = useState(null);
@@ -272,26 +272,44 @@ const ContentDetail = () => {
                             </p>
                         </div>
 
-                        <footer className="mt-16 pt-8 border-t border-border-light flex flex-col sm:flex-row items-center justify-between gap-4">
-                            <div className="text-[10px] text-text-muted font-bold uppercase tracking-widest">
-                                Saved {new Date(content.createdAt).toLocaleDateString(undefined, { dateStyle: 'long' })}
+                        <footer className="mt-16 pt-8 border-t border-border-light flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
+
+                            {/* 📅 Left - Date */}
+                            <div className="flex flex-col">
+                                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-text-muted">
+                                    Saved
+                                </span>
+                                <span className="text-sm font-semibold text-text-secondary">
+                                    {new Date(content.createdAt).toLocaleDateString(undefined, { dateStyle: 'long' })}
+                                </span>
                                 {content.timeAgo && (
-                                    <p className="text-xs text-text-muted ml-2">
-                                        ({content.timeAgo})
-                                    </p>
+                                    <span className="text-xs text-text-muted">
+                                        {content.timeAgo}
+                                    </span>
                                 )}
-                            </div>
-                            <div className="flex gap-6">
-                                <button className="text-text-muted hover:text-red-500 text-[10px] font-bold uppercase tracking-widest transition-colors">Delete</button>
-                                <button className="text-text-muted hover:text-indigo-600 text-[10px] font-bold uppercase tracking-widest transition-colors">Edit</button>
                             </div>
 
                             <button
-                                className="text-text-muted hover:text-green-500 text-[10px] font-bold uppercase tracking-widest transition-colors"
                                 onClick={handleWebSearch}
+                                className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-green-300 text-white text-xs font-bold uppercase tracking-wide hover:bg-green-500 transition shadow-md"
                             >
-                                Web Search
+                                <IoSearch className="text-black" size={25} /> Web Search
                             </button>
+
+                            {/* ⚡ Center - Actions */}
+                            <div className="flex items-center gap-3">
+
+                                <button className="px-4 py-2 rounded-xl bg-red-500/10 text-red-500 text-xs font-bold uppercase tracking-wide hover:bg-red-500/20 transition">
+                                    Delete
+                                </button>
+
+                                <button className="px-4 py-2 rounded-xl bg-indigo-500/10 text-indigo-600 text-xs font-bold uppercase tracking-wide hover:bg-indigo-500/20 transition">
+                                    Edit
+                                </button>
+
+                            </div>
+
+
                         </footer>
                     </div>
                 </div>
