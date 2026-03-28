@@ -8,17 +8,19 @@ import { getTimeAgo } from "../utils/resurface.util.js";
 const addContent = async (req, res) => {
     try {
         const userId = req.user._id;
-        let { type, title, url } = req.body;
+        let { type, title, url, text } = req.body;
 
         if (!type || !title || !url) {
             return res.status(400).json({ message: "Title, Type and Url are required" })
         }
 
+        // console.log("Data", { type, title, url })
+
         const normalized = {}
         normalized.type = type?.toLowerCase().trim();
         normalized.title = title?.trim();
         normalized.url = url?.trim();
-        normalized.text = text?.trim() || "";
+        normalized.text = typeof text === "string" ? text.trim() : "";
 
         const existing = await Content.findOne({
             userId,
