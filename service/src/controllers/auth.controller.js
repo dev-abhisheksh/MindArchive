@@ -1,6 +1,8 @@
 import { User } from "../models/user.model.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import redisClient from "../config/redisClient.js";
+import { sendOtpEmail } from "../services/email.service.js";
 
 export const generateAccessToken = (user) => {
     return jwt.sign(
@@ -28,17 +30,52 @@ const register = async (req, res) => {
             return res.status(400).json({ message: "User already exists" })
         }
 
-        const hashed = await bcrypt.hash(password, 10);
+        const otp = Math.floor(100000 + Math.random() * 900000).toString()
+        const hashedPassword = await bcrypt.hash(password, 10);
 
-        const newUser = await User.create({
-            name,
-            email,
-            password: hashed
-        });
+        await redisClient.set(
+            `otp:${email}`,
+            JSON.stringify({
+                otp,
+                name: name.trim(),
+                password: hashedPassword
+            }),
+            "EX", 300
+        )
 
-        return res.status(201).json({ message: "User registered successfully", user: newUser })
+        await sendOtpEmail(email, otp)
+
+        return res.status(201).json({ message: "OTP sent to your email", })
     } catch (error) {
-        return res.status(500).json({ message: "Internal server error" })
+        console.error("Failed to send OTP", error)
+        return res.status(500).json({ message: "Failed to send OTP" })
+    }
+}
+
+const verifyOTP = async (req, res) => {
+    try {
+        const { email, otp } = req.body;
+
+        const data = await redisClient.get(`otp:${email}`)
+        if (!data) return res.status(400).json({ message: "OTP Expired or not found" })
+
+        const parsed = JSON.parse(data)
+        if (parsed.otp !== opt) return res.status(400).json({ message: "Invalid otp" })
+
+        await User.create({
+            name: parsed.name,
+            email,
+            password: parsed.password
+        })
+
+        await redisClient.del(`otp:${email}`)
+
+        return res.status(200).json({
+            message: "User verified and registered successfully",
+        });
+    } catch (error) {
+        console.error("Failed verifying otp", error)
+        return res.status(500).json({ message: "Internal server error" });
     }
 }
 
@@ -71,5 +108,6 @@ const login = async (req, res) => {
 
 export {
     register,
-    login
+    login,
+    verifyOTP
 }
