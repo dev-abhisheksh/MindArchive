@@ -35,7 +35,7 @@ const VerifyOTP = () => {
     setLoading(true);
     try {
       await verifyOTP({ email, otp });
-      navigate("/login"); // Successful verification redirects to login
+      navigate("/"); // Successful verification redirects to login
     } catch (err) {
       setError(err.response?.data?.message || "Verification failed. Try again.");
     } finally {

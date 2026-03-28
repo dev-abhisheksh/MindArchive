@@ -25,7 +25,7 @@ const register = async (req, res) => {
             return res.status(400).json({ message: "Passwords do not match" })
         }
 
-        const user = await User.findOne({ email });
+        const user = await User.findOne({ email })
         if (user) {
             return res.status(400).json({ message: "User already exists" })
         }
@@ -38,7 +38,7 @@ const register = async (req, res) => {
             JSON.stringify({
                 otp,
                 name: name.trim(),
-                password: hashedPassword
+                password: hashedPassword,
             }),
             "EX", 300
         )
@@ -62,7 +62,7 @@ const verifyOTP = async (req, res) => {
         const parsed = JSON.parse(data)
         if (parsed.otp !== otp) return res.status(400).json({ message: "Invalid otp" })
 
-        await User.create({
+        const user = await User.create({
             name: parsed.name,
             email,
             password: parsed.password
@@ -70,8 +70,11 @@ const verifyOTP = async (req, res) => {
 
         await redisClient.del(`otp:${email}`)
 
+        const token = generateAccessToken(user)
+
         return res.status(200).json({
             message: "User verified and registered successfully",
+            token
         });
     } catch (error) {
         console.error("Failed verifying otp", error)
