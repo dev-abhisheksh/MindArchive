@@ -16,7 +16,9 @@ export const webSearchController = async (req, res) => {
         const results = data.organic
             ?.filter(item => {
                 try {
-                    const domain = new URL(item.link).hostname;
+                    const domain = new URL(item.link).hostname
+                        .replace("www.", "")
+                        .replace("m.", "");
 
                     domainCount[domain] = (domainCount[domain] || 0) + 1;
 
