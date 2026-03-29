@@ -3,6 +3,8 @@ import { Content } from "../models/content.model.js";
 import { contentQueue } from "../queues/content.queue.js";
 import { generateTagsWithAI } from "../services/tagGeneration.service.js";
 import { getTimeAgo } from "../utils/resurface.util.js";
+import redisClient from "../config/redisClient.js";
+import { delRedisCache } from "../utils/deleteCacheFn.js";
 
 
 const addContent = async (req, res) => {
@@ -43,6 +45,10 @@ const addContent = async (req, res) => {
             url: normalized.url
         })
 
+        await delRedisCache([
+            `myContents:${userId}`
+        ])
+
         return res.status(201).json({ message: "Content added successfully", content })
 
     } catch (error) {
@@ -53,6 +59,16 @@ const addContent = async (req, res) => {
 
 const getMyContent = async (req, res) => {
     try {
+        const cacheKey = `myContents:${req.user._id}`;
+        const cached = await redisClient.get(cacheKey);
+        if (cached) {
+            console.log("Cache hit for my contents");
+            const parsed = JSON.parse(cached);
+            return res.status(200).json({ content: parsed });
+        }
+
+        console.log("Cache missed")
+
         const myContent = await Content.find({ userId: req.user._id, isPrivate: false })
             .select("-__v -embedding")
             .sort({ createdAt: -1 });
@@ -61,6 +77,8 @@ const getMyContent = async (req, res) => {
             ...content.toObject(),
             timeAgo: getTimeAgo(content.createdAt)
         }));
+
+        await redisClient.set(cacheKey, JSON.stringify(contentWithTimeAgoo), "EX", 3600)
 
         return res.status(200).json({ content: contentWithTimeAgoo })
     } catch (error) {
