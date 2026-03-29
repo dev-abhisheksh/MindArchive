@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import { Content } from "../models/content.model.js";
 import { User } from "../models/user.model.js";
 import bcrypt from "bcryptjs";
+import redisClient from "../config/redisClient.js";
 
 const setVaultPin = async (req, res) => {
     try {
@@ -57,6 +58,8 @@ const verifyVaultPin = async (req, res) => {
         if (!isMatch) {
             return res.status(400).json({ message: "Invalid vault pin" });
         }
+
+        await redisClient.set(`vault:${user._id}`, "verified", "EX", 300);
 
         res.status(200).json({ message: "Vault pin verified successfully" })
     } catch (error) {

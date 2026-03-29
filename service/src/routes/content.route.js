@@ -16,7 +16,7 @@ router.post("/vault/set-pin", verifyToken, setVaultPin)
 router.get("/vault/check-pin", verifyToken, checkVaultPin)
 router.post("/vault/verify-pin", verifyToken, verifyVaultPin)
 router.post("/vault/toggle/:contentId", verifyToken, addToPrivateVault)
-router.get("/vault/private-contents", verifyToken, fetchPrivateVaultContents)
+router.get("/vault/private-contents", verifyToken, verifyVaultPin, fetchPrivateVaultContents)
 
 router.get("/:contentId", verifyToken, contentById)
 
