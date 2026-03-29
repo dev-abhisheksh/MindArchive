@@ -31,12 +31,17 @@ const worker = new Worker("content-processing",
         const { contentId, text, userId, url } = job.data;
 
         let summary;
+
         const isYoutube = url.includes("youtube.com") || url.includes("youtu.be");
 
-        if (isYoutube) {
-            summary = text.slice(0, 150);
-        } else {
-            summary = await summarizeText(text);
+        const safeText = isYoutube
+            ? text.slice(0, 500)
+            : text.slice(0, 2000);
+        try {
+            summary = await summarizeText(safeText);
+        } catch (err) {
+            console.log("Summary failed, using fallback");
+            summary = safeText.slice(0, 200);
         }
 
         const embedding = await generateEmbedding(summary);

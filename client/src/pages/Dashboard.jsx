@@ -24,7 +24,7 @@ const Dashboard = () => {
             try {
                 const res = await fetchContent();
                 const fetchedData = res.data?.content || res.data || [];
-                console.log(res.data?.content)
+                // console.log(res.data?.content)
                 setContent(Array.isArray(fetchedData) ? fetchedData : []);
             } catch (error) {
                 console.error("Failed to fetch:", error);
