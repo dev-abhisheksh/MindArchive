@@ -1,3 +1,4 @@
+import redisClient from "../config/redisClient.js";
 import { webSearch } from "../services/serper.service.js";
 
 
@@ -6,6 +7,15 @@ export const webSearchController = async (req, res) => {
         const { query } = req.body;
         if (!query || query.trim() === "") {
             return res.status(400).json({ message: "Query is required" })
+        }
+
+        const cacheKey = `webSearch:${query}`;
+        const cached = await redisClient.get(cacheKey);
+        if (cached) {
+            return res.status(200).json({
+                message: "Search results fetched successfully fro cache",
+                results: JSON.parse(cached)
+            })
         }
 
         const data = await webSearch(query)
@@ -33,6 +43,8 @@ export const webSearchController = async (req, res) => {
                 link: item.link,
                 snippet: item.snippet,
             }));
+
+        await redisClient.set(cacheKey, JSON.stringify(results), "EX", 600)
 
         return res.status(200).json({ message: "Search results fetched successfully", results })
     } catch (error) {
