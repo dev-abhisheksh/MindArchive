@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { contentById } from "../api/content.api";
+import { contentById, deleteContent } from "../api/content.api";
 import { verifyPin } from "../api/vault.api";
 import Button from "../components/Button";
 import { fetchRelatedContents } from "../api/relatedContent.api";
@@ -21,6 +21,7 @@ const ContentDetail = () => {
     const [pinError, setPinError] = useState("");
     const [pinLoading, setPinLoading] = useState(false);
     const [results, setResults] = useState([]);
+    const [isSearching, setIsSearching] = useState(false);
     const pinRefs = useRef([]);
 
     useEffect(() => {
@@ -69,7 +70,7 @@ const ContentDetail = () => {
 
     const handleWebSearch = async () => {
         try {
-            setLoading(true);
+            setIsSearching(true);
             const query = `${content.title} ${content.text?.slice(0, 80)}`;
             const res = await webSearch(query);
             console.log(res.data.results);
@@ -77,9 +78,9 @@ const ContentDetail = () => {
         } catch (error) {
             console.error("Web search failed:", error);
         } finally {
-            setLoading(false);
+            setIsSearching(false);
         }
-    }
+    };
 
     const handlePinChange = (value, index) => {
         if (!/^\d?$/.test(value)) return;
@@ -132,6 +133,15 @@ const ContentDetail = () => {
         const match = url.match(regExp);
         return (match && match[2].length === 11) ? `https://www.youtube.com/embed/${match[2]}` : null;
     };
+
+    const handleDeleteContent = async (contentId) => {
+        try {
+            await deleteContent(contentId)
+            navigate("/");
+        } catch (error) {
+            console.error("Error deleting content:", error);
+        }
+    }
 
     if (loading || !content) {
         return (
@@ -272,16 +282,17 @@ const ContentDetail = () => {
                             </p>
                         </div>
 
-                        <footer className="mt-16 pt-8 border-t border-border-light flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
+                        <footer className="mt-16 pt-6 border-t border-border-light dark:border-border-dark flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
 
-                            {/* 📅 Left - Date */}
-                            <div className="flex flex-col">
-                                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-text-muted">
+                            <div className="flex flex-col gap-0.5">
+                                <span className="text-[10px] font-bold uppercase tracking-wider text-text-muted">
                                     Saved
                                 </span>
-                                <span className="text-sm font-semibold text-text-secondary">
+
+                                <span className="text-sm font-semibold text-text-primary">
                                     {new Date(content.createdAt).toLocaleDateString(undefined, { dateStyle: 'long' })}
                                 </span>
+
                                 {content.timeAgo && (
                                     <span className="text-xs text-text-muted">
                                         {content.timeAgo}
@@ -291,24 +302,48 @@ const ContentDetail = () => {
 
                             <button
                                 onClick={handleWebSearch}
-                                className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-green-300 text-white text-xs font-bold uppercase tracking-wide hover:bg-green-500 transition shadow-md"
+                                disabled={isSearching}
+                                className={`w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl 
+    text-xs font-semibold uppercase tracking-wide transition-all duration-200 shadow-sm
+    ${isSearching
+                                        ? "bg-green-400 cursor-not-allowed"
+                                        : "bg-green-500 hover:bg-green-600 active:scale-[0.98]"
+                                    } text-white`}
                             >
-                                <IoSearch className="text-black" size={25} /> Web Search
+                                {isSearching ? (
+                                    <>
+                                        <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                                        Searching...
+                                    </>
+                                ) : (
+                                    <>
+                                        <IoSearch size={18} />
+                                        Web Search
+                                    </>
+                                )}
                             </button>
 
-                            {/* ⚡ Center - Actions */}
-                            <div className="flex items-center gap-3">
+                            {/* ⚡ Right - Actions */}
+                            <div className="flex items-center justify-end gap-2">
 
-                                <button className="px-4 py-2 rounded-xl bg-red-500/10 text-red-500 text-xs font-bold uppercase tracking-wide hover:bg-red-500/20 transition">
+                                <button
+                                    onClick={() => handleDeleteContent(content._id)}
+                                    className="px-3 py-2 rounded-lg 
+            bg-red-500/10 text-red-500 text-xs font-semibold uppercase tracking-wide 
+            hover:bg-red-500/20 active:scale-[0.97] transition-all"
+                                >
                                     Delete
                                 </button>
 
-                                <button className="px-4 py-2 rounded-xl bg-indigo-500/10 text-indigo-600 text-xs font-bold uppercase tracking-wide hover:bg-indigo-500/20 transition">
+                                <button
+                                    className="px-3 py-2 rounded-lg 
+            bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 text-xs font-semibold uppercase tracking-wide 
+            hover:bg-indigo-500/20 active:scale-[0.97] transition-all"
+                                >
                                     Edit
                                 </button>
 
                             </div>
-
 
                         </footer>
                     </div>
