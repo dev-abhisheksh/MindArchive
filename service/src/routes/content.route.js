@@ -1,6 +1,6 @@
 import express from "express";
 import verifyToken from "../middlewares/auth.middleware.js";
-import { addContent, contentById, getContentsByTag, getMyContent } from "../controllers/content.controller.js";
+import { addContent, contentById, deleteContent, getContentsByTag, getMyContent } from "../controllers/content.controller.js";
 import { addToPrivateVault, fetchPrivateVaultContents, setVaultPin, verifyVaultPin, checkVaultPin } from "../controllers/privateVault.controller.js";
 import { verifyVaultAccess } from "../middlewares/vault.middleware.js";
 
@@ -9,7 +9,7 @@ const router = express.Router();
 router.post("/create", verifyToken, addContent)
 router.get("/my-content", verifyToken, getMyContent)
 router.get("/grouped-content", verifyToken, getContentsByTag)
-
+router.delete("/delete/:contentId", verifyToken, deleteContent)
 
 // PRIVATE VAULT ROUTES
 

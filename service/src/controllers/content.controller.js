@@ -137,9 +137,41 @@ const contentById = async (req, res) => {
         });
     }
 };
+
+const deleteContent = async (req, res) => {
+    try {
+        const { contentId } = req.params;
+        const userId = req.user._id;
+
+        if (!contentId) {
+            return res.status(400).json({ message: "ContentId is required" });
+        }
+
+        const content = await Content.findOneAndDelete({
+            _id: contentId,
+            userId
+        });
+
+        if (!content) {
+            return res.status(404).json({
+                message: "Content not found or unauthorized"
+            });
+        }
+
+        return res.status(200).json({
+            message: "Content deleted successfully"
+        });
+
+    } catch (error) {
+        console.error("Error deleting content:", error);
+        return res.status(500).json({ message: "Internal server error" });
+    }
+};
+
 export {
     addContent,
     getMyContent,
     getContentsByTag,
-    contentById
+    contentById,
+    deleteContent
 }
