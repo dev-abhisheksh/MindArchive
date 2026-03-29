@@ -1,8 +1,8 @@
-import redisClient from "../config/redisClient";
+import redisClient from "../config/redisClient.js";
 
-export const verifyVaultPin = async (req, res, next) => {
+export const verifyVaultAccess = async (req, res, next) => {
     try {
-        console.log("Verifying vault pin for user:", req.user._id);
+        // console.log("Verifying vault pin for user:", req.user._id);
         const userId = req.user._id;
 
         const verified = await redisClient.get(`vault:${userId}`);

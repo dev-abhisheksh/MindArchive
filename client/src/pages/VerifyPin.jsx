@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react'
-import { verifyPin, checkVaultPin, setVaultPin } from '../api/vault.api'
+import { verifyPin, checkVaultPin, setVaultPin, fetchPrivateVaultContents } from '../api/vault.api'
 import { useNavigate } from 'react-router-dom'
 import { Lock, Loader2, KeyRound } from 'lucide-react'
 
@@ -7,10 +7,8 @@ const VerifyPin = () => {
     const [pin, setPin] = useState(["", "", "", ""])
     const [error, setError] = useState("")
     const [loading, setLoading] = useState(false)
-    
-    // Modes: 'checking', 'verify', 'create', 'confirm'
     const [mode, setMode] = useState('checking')
-    const [tempPin, setTempPin] = useState("") 
+    const [tempPin, setTempPin] = useState("")
 
     const inputsRef = useRef([])
     const navigate = useNavigate()
@@ -27,11 +25,24 @@ const VerifyPin = () => {
             } catch (err) {
                 console.error("Failed to check PIN status", err)
                 setError("Failed to check Vault status")
-                setMode('verify') 
+                setMode('verify')
             }
         }
         checkStatus();
     }, [])
+
+    useEffect(() => {
+        const checkAccess = async () => {
+            try {
+                await fetchPrivateVaultContents(); // ✅ correct
+                navigate("/vault", { replace: true });
+            } catch (err) {
+                console.log("CHECK ACCESS ERROR:", err.response?.status, err);
+            }
+        };
+
+        checkAccess();
+    }, []);
 
     const handleChange = (value, index) => {
         if (!/^\d?$/.test(value)) return
@@ -77,17 +88,16 @@ const VerifyPin = () => {
                 await verifyPin(finalPin)
                 sessionStorage.setItem("vaultVerified", "true")
                 navigate('/vault', { replace: true })
-                
+
             } else if (mode === 'create') {
                 setTempPin(finalPin)
                 setPin(["", "", "", ""])
                 setMode('confirm')
                 inputsRef.current[0]?.focus()
-                
+
             } else if (mode === 'confirm') {
                 if (finalPin === tempPin) {
                     await setVaultPin(finalPin)
-                    sessionStorage.setItem("vaultVerified", "true")
                     navigate('/vault', { replace: true })
                 } else {
                     setError("PINs do not match. Try again.")
@@ -119,7 +129,7 @@ const VerifyPin = () => {
         if (mode === 'confirm') return "Re-enter your 4-digit PIN to confirm"
         return "Enter your 4-digit PIN to continue"
     }
-    
+
     const getButtonText = () => {
         if (loading) return mode === 'verify' ? "Verifying..." : "Saving..."
         if (mode === 'create') return "Continue"
