@@ -176,6 +176,10 @@ const deleteContent = async (req, res) => {
             });
         }
 
+        await delRedisCache([
+            `myContents:${userId}`
+        ])
+
         return res.status(200).json({
             message: "Content deleted successfully"
         });
