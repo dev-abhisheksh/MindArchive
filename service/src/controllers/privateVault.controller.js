@@ -3,6 +3,7 @@ import { Content } from "../models/content.model.js";
 import { User } from "../models/user.model.js";
 import bcrypt from "bcryptjs";
 import redisClient from "../config/redisClient.js";
+import { delRedisCache } from "../utils/deleteCacheFn.js";
 
 const setVaultPin = async (req, res) => {
     try {
@@ -87,6 +88,10 @@ const addToPrivateVault = async (req, res) => {
 
         content.isPrivate = !content.isPrivate;
         await content.save();
+
+        await delRedisCache([
+            `myContents:${userId}`
+        ])
 
         return res.status(200).json({
             message: content.isPrivate ? "Content added to private vault" : "Content removed from private vault"
