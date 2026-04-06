@@ -25,7 +25,22 @@ app.listen(PORT2, () => {
 await connectDB();
 
 const hash = (text) =>
-    crypto.createHash("md5").update(text).digest("hex");
+    crypto.createHash("md5").update(text || "").digest("hex");
+
+const setCache = async (key, value, ttl) => {
+    try {
+        if (!value) return;
+
+        await redisClient.set(
+            key,
+            typeof value === "string" ? value : JSON.stringify(value),
+            "EX",
+            ttl
+        );
+    } catch (err) {
+        console.error("Redis SET failed:", err.message);
+    }
+};
 
 const worker = new Worker(
     "content-processing",
@@ -34,116 +49,132 @@ const worker = new Worker(
 
         const { contentId, text, userId, url } = job.data;
 
-        const existing = await Content.findById(contentId);
-        if (existing?.embedding && existing?.summary) {
-            console.log("Already processed, skipping...");
+        const lockKey = `lock:${contentId}`;
+        const isLocked = await redisClient.set(lockKey, "1", "NX", "EX", 60);
+
+        if (!isLocked) {
+            console.log("Already being processed, skipping...");
             return;
         }
 
-        let summary;
-
-        const isYoutube = /youtube\.com|youtu\.be/.test(url);
-
-        const safeText = text?.slice(0, isYoutube ? 500 : 2000) || "";
-
-        const summaryKey = `summary:${hash(safeText)}`;
-        const cachedSummary = await redisClient.get(summaryKey);
-
-        if (cachedSummary) {
-            console.log("Summary cache hit");
-            summary = cachedSummary;
-        } else {
-            try {
-                summary = await summarizeText(safeText);
-
-                await redisClient.set(summaryKey, summary, {
-                    "EX": 3600 // 1 hour
-                });
-            } catch (err) {
-                console.log("Summary failed, using fallback");
-                summary = safeText
-                    .split(".")
-                    .slice(0, 2)
-                    .join(".");
+        try {
+            const existing = await Content.findById(contentId);
+            if (existing?.embedding && existing?.summary) {
+                console.log("Already processed, skipping...");
+                return;
             }
-        }
 
-        const embedKey = `embed:${hash(summary)}`;
-        let embedding;
+            const isYoutube = /youtube\.com|youtu\.be/.test(url);
+            const safeText = text?.slice(0, isYoutube ? 500 : 2000) || "";
 
-        const cachedEmbedding = await redisClient.get(embedKey);
+            // ================= SUMMARY =================
+            let summary;
+            const summaryKey = `summary:${hash(safeText)}`;
 
-        if (cachedEmbedding) {
-            console.log("Embedding cache hit");
-            embedding = JSON.parse(cachedEmbedding);
-        } else {
-            embedding = await generateEmbedding(summary);
+            const cachedSummary = await redisClient.get(summaryKey);
 
-            await redisClient.set(embedKey, JSON.stringify(embedding), {
-                EX: 86400 // 1 day
+            if (cachedSummary) {
+                console.log("Summary cache hit");
+                summary = cachedSummary.toString();
+            } else {
+                try {
+                    summary = await summarizeText(safeText);
+                } catch (err) {
+                    console.log("Summary failed, using fallback");
+                    summary = safeText
+                        .split(".")
+                        .slice(0, 2)
+                        .join(".");
+                }
+
+                if (!summary || summary.trim().length === 0) {
+                    summary = safeText.slice(0, 200);
+                }
+
+                await setCache(summaryKey, summary, 3600);
+            }
+
+            // ================= EMBEDDING =================
+            const embedKey = `embed:${hash(summary)}`;
+            let embedding;
+
+            const cachedEmbedding = await redisClient.get(embedKey);
+
+            if (cachedEmbedding) {
+                console.log("Embedding cache hit");
+                embedding = JSON.parse(cachedEmbedding);
+            } else {
+                embedding = await generateEmbedding(summary);
+                await setCache(embedKey, embedding, 86400);
+            }
+
+            // ================= TAGS =================
+            const tagsKey = `tags:${hash(summary)}`;
+            let tags;
+
+            const cachedTags = await redisClient.get(tagsKey);
+
+            if (cachedTags) {
+                console.log("Tags cache hit");
+                tags = JSON.parse(cachedTags);
+            } else {
+                tags = (await generateTagsWithAI(summary))
+                    ?.map(t => t.toLowerCase().trim()) || [];
+
+                await setCache(tagsKey, tags, 86400);
+            }
+
+            // ================= SAVE =================
+            await Content.findByIdAndUpdate(contentId, {
+                embedding,
+                tags,
+                summary
             });
-        }
 
-        const tagsKey = `tags:${hash(summary)}`;
-        let tags;
+            // ================= RELATED =================
+            const relatedContent = await findRelatedContent(
+                contentId,
+                embedding,
+                userId
+            );
 
-        const cachedTags = await redisClient.get(tagsKey);
-
-        if (cachedTags) {
-            console.log("tags cache hit");
-            tags = JSON.parse(cachedTags);
-        } else {
-            tags = (await generateTagsWithAI(summary))
-                .map(t => t.toLowerCase().trim());
-
-            await redisClient.set(tagsKey, JSON.stringify(tags), {
-                EX: 86400 // 1 day
-            });
-        }
-
-        await Content.findByIdAndUpdate(contentId, {
-            embedding,
-            tags,
-            summary
-        });
-
-        const relatedContent = await findRelatedContent(
-            contentId,
-            embedding,
-            userId
-        );
-
-        await Promise.all(
-            relatedContent.map(related =>
-                RelatedContent.updateOne(
-                    { from: contentId, to: related._id },
-                    {
-                        $setOnInsert: {
-                            relation: "semantic_similarity",
-                            score: related.score || 0
-                        }
-                    },
-                    { upsert: true }
+            await Promise.all(
+                relatedContent.map(related =>
+                    RelatedContent.updateOne(
+                        { from: contentId, to: related._id },
+                        {
+                            $setOnInsert: {
+                                relation: "semantic_similarity",
+                                score: related.score || 0
+                            }
+                        },
+                        { upsert: true }
+                    )
                 )
-            )
-        );
+            );
 
-        await Promise.all(
-            relatedContent.map(related =>
-                RelatedContent.updateOne(
-                    { from: related._id, to: contentId },
-                    {
-                        $setOnInsert: {
-                            relation: "semantic_similarity",
-                            score: related.score || 0
-                        }
-                    },
-                    { upsert: true }
+            await Promise.all(
+                relatedContent.map(related =>
+                    RelatedContent.updateOne(
+                        { from: related._id, to: contentId },
+                        {
+                            $setOnInsert: {
+                                relation: "semantic_similarity",
+                                score: related.score || 0
+                            }
+                        },
+                        { upsert: true }
+                    )
                 )
-            )
-        );
+            );
 
-        console.log("Processign completed:", contentId);
+            console.log("Processing completed:", contentId);
+        } catch (err) {
+            console.error("Worker error:", err);
+            throw err; 
+        } finally {
+            await redisClient.del(lockKey);
+        }
     },
     {
         connection: redisClient,
@@ -153,11 +184,10 @@ const worker = new Worker(
     }
 );
 
-
 worker.on("completed", job => {
     console.log("Job completed:", job.id);
 });
 
 worker.on("failed", (job, err) => {
-    console.error("Job failed:", job.id, err);
+    console.error("Job failed:", job?.id, err);
 });
