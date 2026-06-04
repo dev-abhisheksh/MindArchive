@@ -32,14 +32,6 @@ app.use(cors({
   allowedHeaders: ["Content-Type", "Authorization"]
 }));
 
-fetch("https://mindarchiveworker.onrender.com")
-  .then(() => console.log("Worker woken up"))
-  .catch((err) => console.error("Worker wake-up failed:", err.message));
-
-  setInterval(() => {
-    fetch("https://mindarchiveworker.onrender.com")
-    .catch((err) => console.error("Worker wake-up failed:", err.message));
-  }, 5 * 60 * 1000); 
 
 app.use("/api/auth", authRouter);
 app.use("/api/content", contentRouter);

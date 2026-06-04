@@ -1,10 +1,5 @@
-import dotenv from "dotenv";
-dotenv.config();
-
-import express from "express";
 import { Worker } from "bullmq";
 import redisClient from "../config/redisClient.js";
-import connectDB from "../config/db.js";
 import { Content } from "../models/content.model.js";
 import { generateEmbedding } from "../services/embedding.service.js";
 import { generateTagsWithAI } from "../services/tagGeneration.service.js";
@@ -12,17 +7,6 @@ import { findRelatedContent } from "../services/related.service.js";
 import { RelatedContent } from "../models/relatedContent.model.js";
 import { summarizeText } from "../services/textSummary.service.js";
 import crypto from "crypto";
-
-const app = express();
-app.get("/", (req, res) => res.send("Worker running"));
-
-const PORT2 = process.env.PORT2;
-
-app.listen(PORT2, () => {
-    console.log("Dummy server running on", PORT2);
-});
-
-await connectDB();
 
 const hash = (text) =>
     crypto.createHash("md5").update(text || "").digest("hex");
@@ -191,3 +175,5 @@ worker.on("completed", job => {
 worker.on("failed", (job, err) => {
     console.error("Job failed:", job?.id, err);
 });
+
+export default worker;

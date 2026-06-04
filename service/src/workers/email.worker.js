@@ -1,13 +1,16 @@
-import redisClient from "../config/redisClient";
-import { sendOtpEmail } from "../services/email.service";
-import {Worker} from "bullmq"
+import redisClient from "../config/redisClient.js";
+import { sendOtpEmail } from "../services/email.service.js";
+import { Worker } from "bullmq";
 
-new Worker(
+const emailWorker = new Worker(
     "email-queue",  
-    async(job)=>{
-        const {email, otp} = job.data;
-        if(job.name === "send-otp"){
+    async (job) => {
+        const { email, otp } = job.data;
+        if (job.name === "send-otp") {
             await sendOtpEmail(email, otp)
         }
-    }, {connection: redisClient}
-)
+    }, 
+    { connection: redisClient }
+);
+
+export default emailWorker;

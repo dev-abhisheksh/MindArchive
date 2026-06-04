@@ -1,7 +1,9 @@
 import app from "./src/app.js";
 import connectDB from "./src/config/db.js";
+import "./src/workers/content.worker.js";
+import "./src/workers/email.worker.js";
 
-connectDB();
+await connectDB();
 
 const PORT = process.env.PORT || 5000;
 
